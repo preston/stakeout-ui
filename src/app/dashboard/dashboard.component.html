@@ -1,0 +1,83 @@
+<div class="container-fluid" *ngIf="dashboard">
+    <h1 class="text-default">{{dashboard.name}}
+        <button class="btn btn-sm btn-primary" (click)="create()"><span class="bi-plus"></span> Add Service</button>
+    </h1>
+
+    <div class="m-2 card service align-top" *ngFor="let s of dashboard.services">
+        <img src="..." class="card-img-top" alt="...">
+        <div class="card-body">
+            <div *ngIf="!editing[s.id]">
+                <h5 class="card-title">
+                    <span>{{s.name}}</span>
+                    <button class="btn btn-default" role="button" (click)="editing[s.id] = true"><span
+                            class="bi-pencil"></span></button>
+                </h5>
+
+                <!-- <p class="card-text"> -->
+                <span class="badge rounded-pill text-bg-success" *ngIf="s.ping && s.ping_last">ICMP Ping</span>
+                <span class="badge rounded-pill text-bg-danger" *ngIf="s.ping && !s.ping_last">ICMP Ping</span>
+                <span class="badge rounded-pill text-bg-success" *ngIf="s.http && s.http_path_last">HTTP</span>
+                <span class="badge rounded-pill text-bg-danger" *ngIf="s.http && !s.http_path_last">HTTP</span>
+                <span class="badge rounded-pill text-bg-success" *ngIf="s.https && s.https_path_last">HTTPS</span>
+                <span class="badge rounded-pill text-bg-danger" *ngIf="s.https && !s.https_path_last">HTTPS</span>
+                <span *ngIf="s.checked_at"> {{moment()(s.checked_at)}}</span>
+                <span *ngIf="!s.checked_at" class="text-muted"> never checked</span>
+                <!-- </p> -->
+            </div>
+
+
+            <div *ngIf="editing[s.id]">
+                <div class="btn-group">
+                    <button class="btn btn-sm " role="button" *ngIf="editing[s.id]" (click)="editing[s.id] = false"><span class="bi-x"></span> Close</button>
+                    <button class="btn btn-sm btn-primary" role="button" *ngIf="editing[s.id]" (click)="update(s)"><span
+                            class="bi-save"></span> Save</button>
+                </div>
+                <form (submit)="update(s)" role="form" class="form">
+                    <label class="form-label" for="service_name">Name</label>
+                    <div class="input-group">
+                        <input class="form-control form-control-sm" type="text" name="service_name" [(ngModel)]="s.name" autofocus placeholder="My Service" required />
+                    </div>
+                    <label class="form-label" for="service_host">Host</label>
+                    <div class="input-group">
+                        <input class="form-control form-control-sm" type="text" name="service_host" [(ngModel)]="s.host" placeholder="example.com" required />
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="service_http" id="service_http" [(ngModel)]="s.http">
+                        <label class="form-check-label" for="service_http">
+                            HTTP
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="service_https" id="service_https" [(ngModel)]="s.https">
+                        <label class="form-check-label" for="service_https">
+                            HTTPS
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="service_ping" id="service_ping" [(ngModel)]="s.ping">
+                        <label class="form-check-label" for="service_ping">
+                            ICMP Ping
+                        </label>
+                    </div>
+                </form>
+                <button role="button" class="btn btn-danger float-end mb-2" (click)="delete(s)"><span
+                        class="bi-trash"></span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="service m-3 p-0 " *ngFor="let s of dashboard.services " [routerLink]="'./services/' + s.id" role="button">
+            <h2 class="ms-3 mt-3 p-0 name ">{{s.name}}</h2>
+        </div> -->
+</div>
+<!-- <button class="btn btn-sm btn-primary" (click)="update()"><span class="bi-save"></span> Save</button>
+<div *ngIf="dashboard">
+    <form class="form mt-3">
+
+        <div class="form-group">
+            <label class="form-label" for="dashboard_name">Name</label> {{dashboard.name}}
+            <input class="form-control" type="text" name="dashboard_name" [(ngModel)]="dashboard.name" />
+        </div>
+
+    </form>
+</div> -->

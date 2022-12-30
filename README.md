@@ -1,27 +1,29 @@
-Stakeout
-----
+# STAKEOUT UI
 
-A fantastically simple, one-page dashboard for SaaS availability checks. Supports HTTP, HTTPS, ICMP Ping, and automatic screenshots. (For the screenshot feature to work, you'll need PhantomJS installed! http://phantomjs.org/) Stakeout is a Ruby on Rails application utilizing jQuery and Bootstrap.
+The Stakeout UI is web-based frontend for Stakeout Server, and requires an instance of the server to be launched.
 
-![Screenshot](https://raw.github.com/preston/stakeout/master/app/assets/images/screenshots/1.png)
+## Developer Quick Start
 
-Stakeout is designed to be *extremely* simple to use, and does not support complex services, or really anything outside of basic HTTP(S) and ICMP. So if you're looking for Nagios, use Nagios. :)  No built-in authentication or authorization is provided, so for Internet-facing deployments you'll want to implement a challenge at the web server, such as HTTP Basic Auth.
+This is an [Angular](https://angular.io) project using `ng` [@angular/cli](https://cli.angular.io/) as the build system, [SCSS](http://sass-lang.com) for CSS and [Bootstrap](https://getbootstrap.com/) for layout. `npm` is the package manager. Assuming you already have node installed via [`nvm`](https://github.com/nvm-sh/nvm) or similar, run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files. The following must be set:
 
+	export STAKEOUT_SERVER_URL=http://localhost:4200
+	export STAKEOUT_TITLE="My Stakeout"
 
-Todo
-----
+# Building for Production
 
-* Client-side JavaScript needs to be refactored to be asynchronous to not show the "Be cool!" dialog.
-* Server should probably automatically capture screenshots at periodic intervals.. maybe?
+To build with [Docker](https://www.docker.com) and [nginx](http://nginx.org), use the included Dockerfile, such as:
 
+```sh
+	docker build -t p3000/stakeout-ui:latest . # though you probably want your own repo and tag strings :)
 
-Attribution
-----
+	# or cross-platform
+	docker buildx build --platform linux/arm64/v8,linux/amd64 -t p3000/stakeout-ui:latest . --push
+```
 
-Designed and written by Preston Lee.
+## Production Deployment
 
+In your container hosting environment, point an instance at your Stakeout Server installation:
 
-License
-----
-
-Released under the MIT license.
+```sh
+	docker run -d -p 9000:80 --restart unless-stopped -e "STAKEOUT_SERVER_URL=http://localhost:3000" p3000/stakeout-ui:latest # or any official tag
+```

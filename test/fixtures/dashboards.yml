@@ -1,7 +1,0 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
-
-news_sites:
-  name: News Sites
-
-search_services:
-  name: Search Services
