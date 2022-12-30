@@ -4,8 +4,8 @@ export class Service {
     public host: string = '';
     public name: string = '';
     public ping: boolean = true;
-    public ping_threshold: string = '';
-    public ping_last: string = '';
+    public ping_threshold: number = 500;
+    public ping_last: number = -1;
     public http: boolean = true;
     public https: boolean = true;
     public http_path: string = '';
@@ -17,7 +17,6 @@ export class Service {
     public http_screenshot: string = '';
 
     public checked_at: Date | null = null;
-
 
     public created_at: Date | null = null;
     public updated_at: Date | null = null;

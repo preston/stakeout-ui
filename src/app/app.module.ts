@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MomentModule } from 'ngx-moment';
 import { ToastrModule } from 'ngx-toastr';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -30,6 +31,7 @@ import { ToasterConfigurationService } from './toaster/toaster.configuration.ser
     FormsModule,
 		BrowserAnimationsModule, // For Toaster
         ToastrModule.forRoot(),
+        MomentModule,
     AppRoutingModule
   ],
   providers: [

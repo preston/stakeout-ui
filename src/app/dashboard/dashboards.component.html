@@ -29,11 +29,12 @@
             </ul>
             <hr/>
             <div class="mt-3 form-group mt-3">
-                <label for="refresh">Refresh</label>
-                <select class="form-control" [(ngModel)]="refresh" name="refresh">
-                    <option *ngFor="let r of refresh_options" [value]="r"
-                        [selected]="r.value == refresh.value">{{r.name}}</option>
+                <label for="refresh">Auto-Refresh</label>
+                <select class="form-control mt-1" [(ngModel)]="refresh" name="refresh">
+                    <option *ngFor="let r of refresh_options" [value]="r.value"
+                        [selected]="r.value == refresh">{{r.name}}</option>
                 </select>
+                <small *ngIf="refresh">{{last_reload | amTimeAgo}}</small>
 
             </div>
             <button class="mt-3 btn btn-sm btn-secondary" role="button "><span class="bi-unlock "></span> Unlock Admin</button>

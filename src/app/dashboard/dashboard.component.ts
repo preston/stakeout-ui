@@ -16,6 +16,7 @@ import { DashboardService } from "./dashboard.service";
 })
 export class DashboardComponent implements OnInit {
 
+
     @Input() dashboard!: Dashboard;
     @Input() dashboards!: Dashboard[];
 
@@ -35,10 +36,21 @@ export class DashboardComponent implements OnInit {
 
     }
 
-    moment() {
-        return this.backendService.moment();
+    statusLevel(s: Service): string {
+        let status = 'unknown';
+        if (s.checked_at) {
+            if ((!s.http || s.http_path_last) && (!s.https || s.https_path_last) && this.pingGood(s)) {
+                status = 'good';
+            } else {
+                status = 'bad';
+            }
+        }
+        return status;
     }
 
+    pingGood(s: Service) {
+        return !s.ping || s.ping_last > 0 && s.ping_last < s.ping_threshold;
+    }
 
     create() {
         let s = new Service();
@@ -67,7 +79,7 @@ export class DashboardComponent implements OnInit {
         }, e => {
             this.toastrService.error("The service wasn't updated. The server said, " + e, 'Dashboard not updated');
         });
-    // }
+        // }
     }
 
     delete(s: Service) {

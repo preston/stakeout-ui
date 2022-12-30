@@ -5,26 +5,31 @@
 
     <div class="m-2 card service align-top" *ngFor="let s of dashboard.services">
         <div class="crop">
-            <img src="">
-        </div>
-        <div class="overview align-top mt-3">
-            <div *ngIf="!editing[s.id]">
-
-                <h5 class="align-center mb-0 pb-0">
-                    <span>{{s.name}}</span>
-                    <button class="btn btn-default m-0 pt-1" role="button" (click)="editing[s.id] = true"><span
-                        class="bi-pencil"></span></button>
-                </h5>
-
-                <span class="badge rounded-pill text-bg-success" *ngIf="s.ping && s.ping_last">ICMP Ping</span>
-                <span class="badge rounded-pill text-bg-danger" *ngIf="s.ping && !s.ping_last">ICMP Ping</span>
-                <span class="badge rounded-pill text-bg-success" *ngIf="s.http && s.http_path_last">HTTP</span>
-                <span class="badge rounded-pill text-bg-danger" *ngIf="s.http && !s.http_path_last">HTTP</span>
-                <span class="badge rounded-pill text-bg-success" *ngIf="s.https && s.https_path_last">HTTPS</span>
-                <span class="badge rounded-pill text-bg-danger" *ngIf="s.https && !s.https_path_last">HTTPS</span>
-                <p class="checked_at" *ngIf="s.checked_at"> checked {{moment()(s.checked_at)}}</p>
-                <p class="checked_at" *ngIf="!s.checked_at"> never checked</p>
+            <img *ngIf="s.http_screenshot" [src]="'data:image/jpeg;base64, ' + s.http_screenshot" />
+            <div *ngIf="!s.http_screenshot" class="healthLevel">
+                <div [class]="statusLevel(s)"></div>
             </div>
+        </div>
+        <div class="overview align-top m-3">
+            <!-- <div > -->
+
+            <h5 class="align-center mb-0 pb-0">
+                <span>{{s.name}}</span>
+                <button class="btn btn-default my-0 ms-1 pt-1" role="button" *ngIf="!editing[s.id]" (click)="editing[s.id] = true"><span
+                        class="bi-pencil"></span></button>
+
+                <button class="btn btn-default my-0 ms-1 pt-1" role="button" *ngIf="editing[s.id]" (click)="editing[s.id] = false"><span class="bi bi-x"></span> Close</button>
+            </h5>
+
+            <span class="badge rounded-pill" *ngIf="s.ping" [class.text-bg-success]="pingGood(s)" [class.text-bg-danger]="!pingGood(s)">Ping ({{s.ping_last}}ms)</span>
+            <!-- <span class="badge rounded-pill text-bg-danger" *ngIf="s.ping && !s.ping_last">Ping</span> -->
+            <span class="badge rounded-pill text-bg-success" *ngIf="s.http && s.http_path_last">HTTP</span>
+            <span class="badge rounded-pill text-bg-danger" *ngIf="s.http && !s.http_path_last">HTTP</span>
+            <span class="badge rounded-pill text-bg-success" *ngIf="s.https && s.https_path_last">HTTPS</span>
+            <span class="badge rounded-pill text-bg-danger" *ngIf="s.https && !s.https_path_last">HTTPS</span>
+            <p class="checked_at ms-1" *ngIf="s.checked_at"> checked {{s.checked_at | amTimeAgo}}</p>
+            <p class="checked_at ms-1" *ngIf="!s.checked_at"> never checked</p>
+            <!-- </div> -->
             <!-- <div *ngIf="editing[s.id]">
 
             </div> -->
@@ -86,11 +91,10 @@
                 </div>
 
             </form>
-            <div class="btn-group float-start">
+            <div class="btn-group float-start my-2">
                 <button class="btn btn-sm btn-primary" role="button" *ngIf="editing[s.id]" (click)="update(s)"><span class="bi-save"></span> Save</button>
-                <button class="btn btn-sm " role="button" *ngIf="editing[s.id]" (click)="editing[s.id] = false"><span class="bi-x"></span> Close</button>
             </div>
-            <button role="button" class="btn btn-danger float-end mb-2" (click)="delete(s)"><span
+            <button role="button" class="btn btn-danger float-end my-2" (click)="delete(s)"><span
                         class="bi-trash"></span></button>
         </div>
 

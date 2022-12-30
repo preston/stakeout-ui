@@ -5,8 +5,6 @@ import { map } from 'rxjs/operators';
 import { Status } from "../status/status";
 
 
-import * as moment from 'moment';
-
 @Injectable()
 export class BackendService {
 
@@ -35,10 +33,6 @@ export class BackendService {
 	status() {
 		let status = this.http.get<Status>(this.statusUrl(), { headers: this.headers() }).pipe(map(res => res));
 		return status;
-	}
-	
-	moment() {
-		return moment;
 	}
 	
 }
