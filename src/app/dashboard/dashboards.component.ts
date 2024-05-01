@@ -1,3 +1,5 @@
+// Author: Preston Lee
+
 import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { BackendService } from "../backend/backend.service";

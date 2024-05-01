@@ -1,3 +1,5 @@
+// Author: Preston Lee
+
 import { Component, OnInit } from "@angular/core";
 import { ToasterConfigurationService } from "../toaster/toaster.configuration.service";
 import { Service } from "./service";
