@@ -7,14 +7,21 @@ import { Service } from "../service/service";
 import { ServiceService } from "../service/service.service";
 import { Dashboard } from "./dashboard";
 import { DashboardService } from "./dashboard.service";
+import { MomentModule } from "ngx-moment";
+import { FormsModule } from "@angular/forms";
+import { NgIf, NgFor } from "@angular/common";
+import { BaseComponent } from "./base.component";
+import { SettingsService } from "../settings/settings.service";
 
 
 @Component({
     selector: 'dashboard',
     templateUrl: 'dashboard.component.html',
-    styleUrls: ['dashboard.component.scss']
+    styleUrls: ['dashboard.component.scss'],
+    standalone: true,
+    imports: [NgIf, NgFor, FormsModule, MomentModule]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent extends BaseComponent implements OnInit {
 
 
     @Input() dashboard!: Dashboard;
@@ -24,8 +31,8 @@ export class DashboardComponent implements OnInit {
 
     constructor(
         private backendService: BackendService,
-        private serviceService: ServiceService, private toastrService: ToastrService) {
-
+        private serviceService: ServiceService, protected override toastrService: ToastrService, protected settingsService: SettingsService) {
+        super(toastrService);
     }
 
     ngOnInit() {
@@ -35,6 +42,10 @@ export class DashboardComponent implements OnInit {
     reload() {
 
     }
+
+    editable() {
+        return this.settingsService.editable;
+      }
 
     statusLevel(s: Service): string {
         let status = 'unknown';
@@ -55,42 +66,54 @@ export class DashboardComponent implements OnInit {
     create() {
         let s = new Service();
         // s.host
-        let tmp = uuidv4();
+        let tmp = uuidv4().substring(0, 4);
         s.name = 'Service ' + tmp;
-        s.host = tmp;
-        this.serviceService.create(this.dashboard, s).subscribe(r => {
-            this.toastrService.success('Please configure it!', 'Service created.');
-            r.name = '';
-            r.host = '';
-            this.dashboard.services.push(r);
-            // this.select(r)
-            this.editing[r.id] = true;
-            // this.route.navigate(['dashboards', r.id]);
+        s.host = 'https://example.com';
+        this.serviceService.create(this.dashboard, s).subscribe({
+            next: r => {
+                this.toastrService.success('Please configure it!', 'Service created.');
+                this.dashboard.services.push(r);
+                // this.select(r)
+                this.editing[r.id] = true;
+                // this.route.navigate(['dashboards', r.id]);
+            }, error: e => {
+                if (!this.checkAccessDenied(e)) {
+                    this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Service not created.');
+                }
+            }
         });
     }
 
     update(s: Service) {
         // if(this.dashboard){
-        this.serviceService.update(this.dashboard, s).subscribe(d => {
-            this.toastrService.success('Service updated');
-            let i = this.dashboard.services.indexOf(s, 0);
-            this.dashboard.services[i] = d;
-            this.editing[d.id] = false;
-        }, e => {
-            this.toastrService.error("The service wasn't updated. The server said, " + e, 'Dashboard not updated');
+        this.serviceService.update(this.dashboard, s).subscribe({
+            next: d => {
+                this.toastrService.success('Service updated');
+                let i = this.dashboard.services.indexOf(s, 0);
+                this.dashboard.services[i] = d;
+                this.editing[d.id] = false;
+            }, error: e => {
+                if (!this.checkAccessDenied(e)) {
+                    this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Service not updated.');
+                }
+            }
         });
         // }
     }
 
     delete(s: Service) {
-        this.serviceService.delete(this.dashboard, s).subscribe(d => {
-            this.toastrService.success("It's service list has also been removed.", 'Dashboard deleted');
-            let i = this.dashboard.services.indexOf(s, 0);
-            if (i >= 0) {
-                this.dashboard.services.splice(i, 1);
+        this.serviceService.delete(this.dashboard, s).subscribe({
+            next: d => {
+                this.toastrService.success("It's service list has also been removed.", 'Service deleted');
+                let i = this.dashboard.services.indexOf(s, 0);
+                if (i >= 0) {
+                    this.dashboard.services.splice(i, 1);
+                }
+            }, error: e => {
+                if (!this.checkAccessDenied(e)) {
+                    this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Service not deleted.');
+                }
             }
-        }, e => {
-            this.toastrService.error("The service couldn't be removed. The server said, " + e, 'Servicie not deleted');
         });
     }
 }

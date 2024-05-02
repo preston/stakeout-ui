@@ -16,4 +16,33 @@ export abstract class BaseService {
     return this.backendService.headers();
   }
 
+
+  formatErrors(errors: { [field: string]: Array<string> }): string[] {
+    let formatted: string[] = [];
+    for (let [key, msgs] of Object.entries(errors)) {
+      for (let i = 0; i < msgs.length; i++) {
+        // const element = array[i];
+        formatted.push(key + ' ' + msgs[i]);        
+      }
+      // msgs.forEach(msg => {
+      //   formatted.push(key + ' ' + msg);
+      // });
+    }
+    return formatted;
+  }
+
+  formatErrorsHtml(errors: { [field: string]: Array<string> }): string {
+    let html = '<ul>';
+    for (let e of this.formatErrors(errors)) {
+      html += '<li>' + e + '</li>';
+    }
+    html += '</ul>'
+    return html;
+  }
+
+  formatErrorsText(errors: { [field: string]: Array<string> }): string {
+    let text = this.formatErrors(errors).join(', ');
+    return text;
+  }
+
 }

@@ -6,10 +6,10 @@ import { Service } from "./service";
 import { ServiceService } from "./service.service";
 
 @Component({
-	selector: 'services',
-	templateUrl: 'services.component.html',
-	styleUrls: ['services.component.scss'],
-	// providers: [CarouselModule]
+    selector: 'services',
+    templateUrl: 'services.component.html',
+    styleUrls: ['services.component.scss'],
+    standalone: true,
 })
 export class ServicesComponent implements OnInit {
 
