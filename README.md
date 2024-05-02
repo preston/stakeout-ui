@@ -14,7 +14,7 @@ This is an [Angular](https://angular.io) project using `ng` [@angular/cli](https
 To build with [Docker](https://www.docker.com) and [nginx](http://nginx.org), use the included Dockerfile, such as:
 
 ```sh
-	docker build -t p3000/stakeout-ui:latest . # though you probably want your own repo and tag strings :)
+	docker build --platform linux/amd64 -t p3000/stakeout-ui:latest . # though you probably want your own repo and tag strings :)
 
 	# or cross-platform
 	docker buildx build --platform linux/arm64/v8,linux/amd64 -t p3000/stakeout-ui:latest . --push
