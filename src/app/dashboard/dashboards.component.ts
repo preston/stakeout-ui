@@ -35,8 +35,7 @@ export class DashboardsComponent extends BaseComponent implements OnInit {
 
     refresh_options = [
         { name: 'Disabled', value: 0 },
-        { name: '5 Seconds', value: 1000 * 5 },
-        { name: '15 Seconds', value: 1000 * 15 },
+        // { name: '15 Seconds', value: 1000 * 15 },
         { name: '1 Minute', value: 1000 * 60 },
         { name: '15 Minutes', value: 1000 * 60 * 15 },
         { name: '1 Hour', value: 1000 * 60 * 60 },
@@ -55,6 +54,11 @@ export class DashboardsComponent extends BaseComponent implements OnInit {
         protected dashboardService: DashboardService,
         protected override toastrService: ToastrService, protected settingsService: SettingsService) {
         super(toastrService);
+
+        if (this.settingsService.settings.developer) {
+            this.refresh_options.unshift(
+                { name: "5 Seconds (Developers Only)", value: 1000 * 5 });
+        }
     }
 
     ngOnInit() {

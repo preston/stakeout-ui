@@ -14,7 +14,9 @@ export class SettingsService implements OnInit {
   public settings: Settings = new Settings;
   public force_reset: boolean = false;
 
-  public editable: boolean = true;
+  // Set to true for easier debugging and development.
+  // public editable: boolean = true;
+  public editable: boolean = false;
 
   constructor() {
     this.reload();
