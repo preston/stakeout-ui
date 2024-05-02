@@ -1,14 +1,14 @@
 // Author: Preston Lee
 
-import {Injectable} from "@angular/core";
-import {HttpClient} from '@angular/common/http';
+import { Injectable } from "@angular/core";
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 
-import {BaseService} from "../base/base.service";
+import { BaseService } from "../base/base.service";
 
-import {BackendService} from '../backend/backend.service';
+import { BackendService } from '../backend/backend.service';
 
-import {Dashboard} from '../dashboard/dashboard';
+import { Dashboard } from '../dashboard/dashboard';
 import { Service } from "./service";
 import { DashboardService } from "../dashboard/dashboard.service";
 
@@ -27,10 +27,11 @@ export class ServiceService extends BaseService {
     }
 
 
-    index(dashboard: Dashboard) {
-        let services = this.http.get<Service[]>(this.url(dashboard), {headers: this.headers()}).pipe(map(res => res));
+    index(dashboard: Dashboard, sort: string = 'priority', order: string = 'desc') {
+        let params = new HttpParams().set('sort', sort).set('order', order);
+        let services = this.http.get<Service[]>(this.url(dashboard), { headers: this.headers(), params: params }).pipe(map(res => res));
         return services;
-    }    
+    }
 
 
 

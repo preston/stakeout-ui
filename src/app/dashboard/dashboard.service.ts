@@ -26,7 +26,7 @@ export class DashboardService extends BaseService {
         return this.backendService.url + DashboardService.PATH;
     }
 
-    index(cache: boolean = true) {
+    index(cache: boolean = true, sort: string = 'priority', order: string = 'desc') {
         // let dashboards = (this.dashboards);
         // if (dashboards && !cache) {
             let dashboards = this.http.get<Dashboard[]>(this.url(), { headers: this.headers() }).pipe(map(res => res));

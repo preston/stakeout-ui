@@ -34,7 +34,7 @@ export class SettingsComponent implements OnInit {
   unlock() {
     this.backendService.test().subscribe({
       next: res => {
-        this.toastrService.success("Authenticated connection was successful.", "Test Successful");
+        this.toastrService.success("Auto-refresh will be disabled while in edit mode.", "Authentication Successful");
         this.settingsService.editable = true;
       }, error: err => {
         this.toastrService.error("Failed to authenticate. Check username, password, and Internet connection.", "Test Failed");

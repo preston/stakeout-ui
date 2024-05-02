@@ -9,7 +9,13 @@
 
             <ul class="list-unstyled components">
                 <li>
-                    <h4 class="mt-4">Dashboards
+                    <h4 class="mt-4">
+                        <a class="" role="button" (click)="sortBy('name')">
+                            <span class="bi bi-arrow-down" *ngIf="sort == 'name' && order == 'asc'"></span>
+                            <span class="bi bi-arrow-up" *ngIf="sort == 'name' && order == 'desc'"></span>
+                            </a>
+            
+                        Dashboards
                         @if(editable()) {
                         <button class="ms-1 btn btn-sm btn-primary " role="button " (click)="create() "><span
                                 class="bi-plus-circle"></span> Add</button>
@@ -42,18 +48,7 @@
 
             </ul>
             <hr />
-            <div class="mt-3 form-group">
-                <label for="refresh">Auto-Refresh</label>
-                <select class="form-control form-control-sm mt-1" [(ngModel)]="refresh" name="refresh">
-                    <option *ngFor="let r of refresh_options" [value]="r.value" [selected]="r.value == refresh">
-                        {{r.name}}</option>
-                </select>
-                <p *ngIf="refresh" class="text-center">
-                    <small>
-                        updated {{last_reload | amTimeAgo}}</small>
-                </p>
 
-            </div>
 
             <button class="mt-3 btn btn-sm btn-secondary float-end" [routerLink]="['/settings']"><span
                     class="bi bi-gear"></span></button>
@@ -66,7 +61,8 @@
                 <span></span>
                 <span></span>
             </button>
-            <dashboard *ngIf="dashboard_full " [dashboard]="dashboard_full"></dashboard>
+            <router-outlet></router-outlet>
+            <!-- <dashboard *ngIf="dashboard_full " [dashboard]="dashboard_full"></dashboard> -->
         </div>
     </div>
 </div>

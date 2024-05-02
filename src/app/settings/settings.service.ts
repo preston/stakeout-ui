@@ -21,7 +21,7 @@ export class SettingsService implements OnInit {
   constructor() {
     this.reload();
   }
-  
+
   ngOnInit() {
   }
 
