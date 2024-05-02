@@ -1,5 +1,11 @@
-/* You can add global styles to this file, and also import other style files */
-
+@import './skycapp.scss';
 body {
     background: url(/assets/images/textures/binding_dark.png) repeat;
+    // font-family: 'skycapp';
+}
+
+.title, label, span,
+h1,h2,h3,h4,h5,h5 {
+    font-family: 'skycapp';
+    // color: #aaa;
 }

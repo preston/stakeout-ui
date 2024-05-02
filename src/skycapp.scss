@@ -1,0 +1,17 @@
+@font-face {
+    font-family: skycapp;
+    src: url(/assets/fonts/Metropolis\ Regular.otf) format("opentype");
+}
+
+@font-face {
+    font-family: skycapp-symbol;
+    src: url(/assets/fonts/Metropolis\ Ornaments.otf) format("opentype");
+}
+
+.skycapp-brand {
+    font-family: 'skycapp';
+}
+
+.skycapp-symbol {
+    font-family: 'skycapp-symbol';
+}
