@@ -2,6 +2,10 @@ h1 {
     color: #aaa;
 }
 
+h5 {
+    width: 218px;
+}
+
 .card {
     width: 400px;
     // height: 200px;
@@ -9,6 +13,7 @@ h1 {
     border-radius: 2px;
     border: none;
     box-shadow: 0 20px 20px #000;
+
     .crop {
         // clear: none;
         display: inline-block;
@@ -16,6 +21,7 @@ h1 {
         position: relative;
         height: 150px;
         width: 150px;
+
         img {
             position: absolute;
             width: 100%;
@@ -26,8 +32,10 @@ h1 {
             // -ms-transform: translate(-50%, -50%);
             // transform: translate(-50%, -50%);
         }
+
         .healthLevel {
             margin: 15px;
+
             // height: 80%;
             // width: 80%;
             // border-radius: 50%;
@@ -39,6 +47,7 @@ h1 {
                 border: none;
                 box-shadow: 0 -5px 20px #111 inset, 0 10px 10px #000;
             }
+
             .bad {
                 background: darkred;
                 background-image: radial-gradient(black, transparent);
@@ -49,6 +58,7 @@ h1 {
                 position: absolute;
                 animation: 4s red infinite;
             }
+
             .unknown {
                 background: orange;
                 background-image: radial-gradient(red, transparent);
@@ -59,6 +69,7 @@ h1 {
                 position: absolute;
                 animation: 4s yellow infinite;
             }
+
             .good {
                 background: darkgreen;
                 background-image: radial-gradient(lime, transparent);
@@ -71,9 +82,11 @@ h1 {
             }
         }
     }
+
     .overview {
         display: inline-block;
     }
+
     .checked_at {
         font-size: smaller;
     }
@@ -83,18 +96,23 @@ h1 {
     0% {
         opacity: 1
     }
+
     20% {
         opacity: 1
     }
+
     40% {
         opacity: 1
     }
+
     60% {
         opacity: .1
     }
+
     80% {
         opacity: .1
     }
+
     100% {
         opacity: .1
     }
@@ -104,24 +122,31 @@ h1 {
     0% {
         opacity: .1
     }
+
     20% {
         opacity: .1
     }
+
     40% {
         opacity: 1
     }
+
     50% {
         opacity: .1
     }
+
     60% {
         opacity: .1
     }
+
     80% {
         opacity: .1
     }
+
     86% {
         opacity: 1
     }
+
     100% {
         opacity: 1
     }
@@ -131,18 +156,23 @@ h1 {
     0% {
         opacity: .1
     }
+
     40% {
         opacity: .1
     }
+
     60% {
         opacity: 1
     }
+
     80% {
         opacity: 1
     }
+
     83% {
         opacity: .1
     }
+
     100% {
         opacity: .1
     }
