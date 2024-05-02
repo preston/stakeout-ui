@@ -65,7 +65,7 @@
                     <div *ngIf="s.http || s.https">
                         <label class="form-label mt-2" for="service_http_path">HTTP(S) Path (optional)</label>
                         <div class="input-group mb-2">
-                            <input class="form-control form-control-sm" type="number" name="service_http_path"
+                            <input class="form-control form-control-sm" type="text" name="service_http_path"
                                 [(ngModel)]="s.http_path" required />
                         </div>
                     </div>

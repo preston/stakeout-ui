@@ -68,7 +68,7 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         // s.host
         let tmp = uuidv4().substring(0, 4);
         s.name = 'Service ' + tmp;
-        s.host = 'https://example.com';
+        s.host = 'example.com';
         this.serviceService.create(this.dashboard, s).subscribe({
             next: r => {
                 this.toastrService.success('Please configure it!', 'Service created.');

@@ -6,7 +6,7 @@ The Stakeout UI is web-based frontend for Stakeout Server, and requires an insta
 
 This is an [Angular](https://angular.io) project using `ng` [@angular/cli](https://cli.angular.io/) as the build system, [SCSS](http://sass-lang.com) for CSS and [Bootstrap](https://getbootstrap.com/) for layout. `npm` is the package manager. Assuming you already have node installed via [`nvm`](https://github.com/nvm-sh/nvm) or similar, run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files. The following must be set:
 
-	export STAKEOUT_SERVER_URL=http://localhost:4200
+	export STAKEOUT_SERVER_URL=http://localhost:3000
 	export STAKEOUT_TITLE="My Stakeout"
 
 # Building for Production
