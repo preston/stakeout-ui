@@ -52,25 +52,25 @@
     <div class="clearfix"></div>
 
     <div class="m-2 card service align-top" *ngFor="let s of dashboard.services">
-        <div class="crop">
+        <div class="crop" [class.has_screenshot]="s.http_screenshot">
             <img *ngIf="s.http_screenshot" [src]="'data:image/jpeg;base64, ' + s.http_screenshot" />
             <div *ngIf="!s.http_screenshot" class="healthLevel">
                 <div [class]="statusLevel(s)"></div>
             </div>
         </div>
-        <div class="overview align-top m-3">
+        <div class="overview align-top ms-3 mt-2">
             <!-- <div > -->
 
-            <h5 class="align-center mb-0 pb-0">
-                <span>{{s.name}}</span>
+            <h4 class="align-center mb-0 pb-0">
                 @if(editable()){
-                <button class="btn btn-default my-0 ms-1 pt-1" role="button" *ngIf="!editing[s.id]"
+                    <button class="btn btn-default float-end" role="button" *ngIf="!editing[s.id]"
                     (click)="editing[s.id] = true"><span class="bi-pencil"></span></button>
-
-                <button class="btn btn-default float-end my-0 ms-1 pt-1" role="button" *ngIf="editing[s.id]"
+                    
+                    <button class="btn btn-default float-end " role="button" *ngIf="editing[s.id]"
                     (click)="editing[s.id] = false"><span class="bi bi-x"></span> Close</button>
                 }
-            </h5>
+                <span>{{s.name}}</span>
+            </h4>
 
             <span class="badge mx-1 rounded-pill" *ngIf="s.ping" [class.text-bg-success]="pingGood(s)"
                 [class.text-bg-danger]="!pingGood(s)">Ping {{s.ping_last}}ms</span>
