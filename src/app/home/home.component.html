@@ -50,8 +50,10 @@
             <hr />
 
 
-            <button class="mt-3 btn btn-sm btn-secondary float-end" [routerLink]="['/settings']"><span
+            <button class="m-1 btn btn-sm btn-secondary float-end" [routerLink]="['/settings']"><span
                     class="bi bi-gear"></span></button>
+            <button *ngIf="settingsService.editable" class="m-1 btn btn-sm btn-secondary float-end" (click)="lock()"><span
+                class="bi bi-lock"></span> Lock Editing</button>
         </nav>
 
         <div id="content">

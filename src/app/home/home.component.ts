@@ -44,12 +44,12 @@ export class HomeComponent extends BaseComponent implements OnInit {
     constructor(
         protected backendService: BackendService,
         protected dashboardService: DashboardService,
-        protected override toastrService: ToastrService, 
+        protected override toastrService: ToastrService,
         protected route: Router,
         protected settingsService: SettingsService) {
         super(toastrService);
 
-  
+
     }
 
     ngOnInit() {
@@ -61,6 +61,10 @@ export class HomeComponent extends BaseComponent implements OnInit {
 
     }
 
+
+    lock() {
+        this.settingsService.editable = false;
+    }
 
     editable() {
         return this.settingsService.editable;

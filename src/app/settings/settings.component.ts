@@ -6,6 +6,7 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { BackendService } from '../backend/backend.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -16,7 +17,12 @@ import { BackendService } from '../backend/backend.service';
 })
 export class SettingsComponent implements OnInit {
 
-  constructor(protected toastrService: ToastrService, protected settingsService: SettingsService, protected backendService: BackendService, public location: Location) {
+  constructor(protected toastrService: ToastrService,
+    protected settingsService: SettingsService,
+    protected backendService: BackendService,
+    public location: Location,
+    protected router: Router,
+  ) {
   }
 
   ngOnInit() {
@@ -36,13 +42,15 @@ export class SettingsComponent implements OnInit {
       next: res => {
         this.toastrService.success("Auto-refresh will be disabled while in edit mode.", "Authentication Successful");
         this.settingsService.editable = true;
+        this.router.navigate(['/']);
       }, error: err => {
         this.toastrService.error("Failed to authenticate. Check username, password, and Internet connection.", "Test Failed");
       }
     });
+
   }
 
-  lock() {  
+  lock() {
     this.settingsService.editable = false;
   }
 
