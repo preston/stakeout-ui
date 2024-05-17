@@ -7,11 +7,11 @@ import { Status } from "../status/status";
 import { Dashboard } from "../dashboard/dashboard";
 import { DashboardService } from "../dashboard/dashboard.service";
 import { v4 as uuidv4 } from 'uuid';
-import { Router, RouterLink, RouterOutlet } from "@angular/router";
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { MomentModule } from "ngx-moment";
 import { DashboardComponent } from "../dashboard/dashboard.component";
 import { FormsModule } from "@angular/forms";
-import { NgFor, NgIf } from "@angular/common";
+import { CommonModule, NgFor, NgIf } from "@angular/common";
 import { BaseComponent } from "../dashboard/base.component";
 import { SettingsService } from "../settings/settings.service";
 
@@ -20,7 +20,7 @@ import { SettingsService } from "../settings/settings.service";
     templateUrl: 'home.component.html',
     styleUrls: ['home.component.scss'],
     standalone: true,
-    imports: [NgFor, RouterLink, NgIf, FormsModule, DashboardComponent, MomentModule, RouterOutlet]
+    imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, DashboardComponent, MomentModule, RouterOutlet]
 })
 export class HomeComponent extends BaseComponent implements OnInit {
 
@@ -34,7 +34,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
     editing: { [key: string]: boolean } = {};
 
     public dashboards: Dashboard[] = [];
-    public dashboard_full: Dashboard | null = null;
+    public dashboard: Dashboard | null = null;
 
     page = '1';
     perPage = '25';
@@ -84,26 +84,16 @@ export class HomeComponent extends BaseComponent implements OnInit {
     reload() {
         this.dashboardService.index(false, this.sort, this.order).subscribe(d => {
             this.dashboards = d;
-            // this.last_reload = Date.now();
-            // console.log("Completed load of dashboard data at " + this.last_reload);
-            // if (!this.dashboard_full && this.dashboards.length > 0) {
-            //     this.select(this.dashboards[0]);
-            // } else {
-            //     this.select(this.dashboard_full);
-            // }
         });
     }
 
     select(dashboard: Dashboard | null) {
-        // this.dashboard_full = null;
         if (dashboard) {
-            this.dashboard_full = dashboard;
-            this.route.navigate(['dashboards', dashboard.id]);
-            // this.dashboardService.get(dashboard.id).subscribe((r) => {
-            //     console.log("Dashboard " + r.name + ' details loaded.');
-            // });
+            this.dashboard = dashboard;
+            this.route.navigate(['/dashboards', dashboard.id]);
         } else {
-            this.dashboard_full = null;
+            this.dashboard = null;
+            this.route.navigate(['/']);
         }
     }
 
@@ -141,7 +131,6 @@ export class HomeComponent extends BaseComponent implements OnInit {
                     this.editing[d.id] = false;
                     this.dashboards[i] = d;
                     this.select(d);
-                    // this.dashboard_full = d;
                 }, error: e => {
                     if (!this.checkAccessDenied(e)) {
                         this.toastrService.error(this.dashboardService.formatErrorsText(e.errors), 'Dashboard not updated.');
@@ -155,12 +144,11 @@ export class HomeComponent extends BaseComponent implements OnInit {
         this.dashboardService.delete(dashboard).subscribe({
             next: d => {
                 this.toastrService.success("It's service list has also been removed.", 'Dashboard deleted');
+                console.log("Deleted dashboard: " + dashboard.name);                
+                this.select(null);
                 let i = this.dashboards.indexOf(dashboard, 0);
                 if (i >= 0) {
                     this.dashboards.splice(i, 1);
-                }
-                if (this.dashboard_full && this.dashboard_full.id == dashboard.id) {
-                    this.select(null);
                 }
             }, error: e => {
                 if (!this.checkAccessDenied(e)) {
