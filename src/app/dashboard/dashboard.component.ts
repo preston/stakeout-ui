@@ -104,12 +104,10 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         if (this.id) {
             this.dashboardService.get(this.id).subscribe((r) => {
                 this.last_reload = Date.now();
-                console.log("Dashboard " + r.name + ' details loaded.');
-                // this.dashboard_full = r;
+                console.log("Dashboard " + r.name + ' found. Loading services...');
                 this.dashboard = r;
                 this.serviceService.index(this.dashboard, this.sort, this.order).subscribe((r) => {
                     // console.log("Dashboard " + r.name + ' details loaded.');
-                    // this.dashboard_full = r;
                     this.dashboard.services = r;
                 });
             });
