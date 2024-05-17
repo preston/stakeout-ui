@@ -33,7 +33,7 @@ export class DashboardComponent extends BaseComponent implements OnInit {
 
     page = '1';
     perPage = '25';
-    sort: 'name' | 'ping' = 'name';
+    sort: 'name' | 'ping' | 'updated_at' = 'name';
     order: 'asc' | 'desc' = 'asc';
 
 
@@ -94,7 +94,7 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         }, 1000);
     }
 
-    sortBy(sort: 'name' | 'ping') {
+    sortBy(sort: 'name' | 'ping' | 'updated_at') {
         this.sort = sort;
         this.order = this.order === 'asc' ? 'desc' : 'asc';
         this.reload();

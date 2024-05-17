@@ -18,14 +18,25 @@
 
     <div class="btn-group float-end m-2">
         <button class="btn btn-sm btn-secondary" role="button" (click)="sortBy('name')">
+            <span class="bi bi-tag"></span>
+            Name
             <span class="bi bi-arrow-down" *ngIf="sort == 'name' && order == 'asc'"></span>
             <span class="bi bi-arrow-up" *ngIf="sort == 'name' && order == 'desc'"></span>
-            Name</button>
-
+        </button>
+        
         <button class="btn btn-sm btn-secondary" role="button" (click)="sortBy('ping')">
+            <span class="bi bi-hdd"></span>
+            Ping
             <span class="bi bi-arrow-down" *ngIf="sort == 'ping' && order == 'asc'"></span>
             <span class="bi bi-arrow-up" *ngIf="sort == 'ping' && order == 'desc'"></span>
-            Ping</button>
+        </button>
+        
+        <button class="btn btn-sm btn-secondary" role="button" (click)="sortBy('updated_at')">
+            <span class="bi bi-calendar"></span>
+            Last Updated
+            <span class="bi bi-arrow-down" *ngIf="sort == 'updated_at' && order == 'asc'"></span>
+            <span class="bi bi-arrow-up" *ngIf="sort == 'updated_at' && order == 'desc'"></span>
+        </button>
 
     </div>
 
