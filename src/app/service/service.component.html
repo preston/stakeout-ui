@@ -1,3 +1,135 @@
-<div *ngIf="service">
-    <h1>Edit {{service.name}}</h1>
+<div *ngIf="service" [class.wide-service]="settingsService.displayMode == 'wide'"
+    [class.overlay-service]="settingsService.displayMode == 'overlay'">
+    <div class="crop" [class.has_screenshot]="service.http_screenshot && settingsService.screenshots">
+        <img *ngIf="service.http_screenshot && settingsService.screenshots"
+            [src]="'data:image/jpeg;base64, ' + service.http_screenshot" />
+        <div *ngIf="!(service.http_screenshot && settingsService.screenshots)" class="healthLevel">
+            <div class="level" [class]="statusLevel(service)"></div>
+        </div>
+    </div>
+
+    <div class="details align-top">
+        <h4 class="align-center mb-0 pb-0">
+            @if(editable()){
+            <button class="btn btn-sm btn-outline-dark float-end" role="button" *ngIf="!editing"
+                (click)="editing = true"><span class="bi-pencil"></span></button>
+
+            <button class="btn btn-sm btn-outline-dark float-end " role="button" *ngIf="editing"
+                (click)="editing = false"><span class="bi bi-x"></span> Close</button>
+            }
+            <span>{{service.name}}</span>
+        </h4>
+
+        <div class="badges">
+            <span class="badge m-1 rounded-pill" *ngIf="service.ping" [class.text-bg-success]="pingGood(service)"
+                [class.text-bg-danger]="!pingGood(service)">Ping {{service.ping_last}}ms</span>
+            <a *ngIf="service.http && service.http_path_last" [href]="'http://' + service.host + service.http_path"
+                target="_blank">
+                <span class="badge m-1 rounded-pill text-bg-success">
+                    HTTP
+                </span>
+            </a>
+            <a *ngIf="service.http && !service.http_path_last" [href]="'http://' + service.host + service.http_path"
+                target="_blank">
+                <span class="badge m-1 rounded-pill text-bg-danger">HTTP</span>
+            </a>
+            <a *ngIf="service.https && service.https_path_last" [href]="'https://' + service.host + service.http_path"
+                target="_blank">
+                <span class="badge m-1 rounded-pill text-bg-success">HTTPS</span>
+            </a>
+            <a *ngIf="service.https && !service.https_path_last" [href]="'https://' + service.host + service.http_path"
+                target="_blank">
+                <span class="badge m-1 rounded-pill text-bg-danger">HTTPS</span>
+            </a>
+            
+            <p class="checked_at ms-1" *ngIf="service.checked_at"> checked {{service.checked_at | amTimeAgo}}</p>
+            <p class="checked_at ms-1" *ngIf="!service.checked_at"> never checked</p>
+        </div>
+    </div>
+
+    @if(editable()){
+    <div class="m-2" *ngIf="editing">
+        <form (submit)="update(service)" role="form" class="form row">
+            <div class="col-sm-6">
+                <label class="form-label" for="service_name">Name</label>
+                <div class="input-group">
+                    <input class="form-control form-control-sm" type="text" name="service_name"
+                        [(ngModel)]="service.name" autofocus placeholder="My Service" required />
+                </div>
+                <label class="form-label mt-2" for="service_host">Host</label>
+                <div class="input-group mb-2">
+                    <input class="form-control form-control-sm" type="text" name="service_host"
+                        [(ngModel)]="service.host" placeholder="example.com" required />
+                </div>
+
+                <div *ngIf="service.http || service.https">
+                    <label class="form-label mt-2" for="service_http_path">HTTP(S) Path (optional)</label>
+                    <div class="input-group mb-2">
+                        <input class="form-control form-control-sm" type="text" name="service_http_path"
+                            [(ngModel)]="service.http_path" required />
+                    </div>
+                </div>
+
+                <div *ngIf="service.http || service.https">
+                    <label class="form-label mt-2" for="service_port">Alternate HTTP(S) Port
+                    </label>
+                    <div class="input-group mb-2">
+                        <input class="form-control form-control-sm" type="text" name="service_port"
+                            [(ngModel)]="service.port" required />
+                    </div>
+                    <small class="fw-lighter">'0' uses protocol defaults.</small>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label">Protocols</label>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="service_http" id="service_http"
+                        [(ngModel)]="service.http">
+                    <label class="form-check-label" for="service_http">
+                        HTTP
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="service_https" id="service_https"
+                        [(ngModel)]="service.https">
+                    <label class="form-check-label" for="service_https">
+                        HTTPS
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="service_ping" id="service_ping"
+                        [(ngModel)]="service.ping">
+                    <label class="form-check-label" for="service_ping">
+                        ICMP Ping
+                    </label>
+                </div>
+
+
+                <hr>
+                <div class="form-check" *ngIf="service.http || service.https">
+                    <input class="form-check-input" type="checkbox" name="service_http_preview"
+                        id="service_http_preview" [(ngModel)]="service.http_preview">
+                    <label class="form-check-label" for="service_http_preview">
+                        Capture HTTP(S) Preview?
+                    </label>
+                </div>
+
+                <div *ngIf="service.ping">
+                    <label class="form-label mt-2" for="service_ping_threshold">Ping Threshold (ms)</label>
+                    <div class="input-group mb-2">
+                        <input class="form-control form-control-sm" type="number" name="service_ping_threshold"
+                            [(ngModel)]="service.ping_threshold" required />
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="btn-group my-2">
+                <button class="btn btn-primary" role="button" *ngIf="editing" (click)="update(service)"><span
+                    class="bi-save"></span> Save</button>
+                </div>
+            </form>
+    </div>
+    }
 </div>

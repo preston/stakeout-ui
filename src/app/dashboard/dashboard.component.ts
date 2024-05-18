@@ -13,6 +13,7 @@ import { NgIf, NgFor } from "@angular/common";
 import { BaseComponent } from "./base.component";
 import { SettingsService } from "../settings/settings.service";
 import { ActivatedRoute, Router } from "@angular/router";
+import { ServiceComponent } from "../service/service.component";
 
 
 @Component({
@@ -20,7 +21,7 @@ import { ActivatedRoute, Router } from "@angular/router";
     templateUrl: 'dashboard.component.html',
     styleUrls: ['dashboard.component.scss'],
     standalone: true,
-    imports: [NgIf, NgFor, FormsModule, MomentModule]
+    imports: [NgIf, NgFor, FormsModule, MomentModule, ServiceComponent]
 })
 export class DashboardComponent extends BaseComponent implements OnInit {
 
@@ -28,24 +29,31 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     // @Input() dashboard!: Dashboard;
     dashboard: Dashboard = new Dashboard();
     // @Input() dashboards!: Dashboard[];
-
-    editing: { [key: string]: boolean } = {};
+    services: Service[] = [];
+    loading: boolean = true;
 
     page = '1';
     perPage = '25';
     sort: 'name' | 'ping' | 'updated_at' = 'name';
     order: 'asc' | 'desc' = 'asc';
 
+    editing: { [key: string]: boolean } = {};
+
+    setDisplayMode(mode: 'wide' | 'overlay') {
+        this.settingsService.displayMode = mode;
+        console.log("Display mode set to " + this.settingsService.displayMode);
+        
+    }
 
     refresh_options = [
-        { name: ' Refresh Disabled', value: 0 },
+        { name: ' Screen Refresh Disabled', value: 0 },
         // { name: '15 Second Refresh', value: 1000 * 15 },
         { name: '1 Minute Refresh', value: 1000 * 60 },
         { name: '15 Minute Refresh', value: 1000 * 60 * 15 },
         { name: '1 Hour Refresh', value: 1000 * 60 * 60 },
     ]
 
-    public refresh: number = 0;
+    refresh: number = 0;
     last_reload: number = 0;
 
     constructor(
@@ -62,7 +70,7 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         // this.id = this.router.snapshot.paramMap.get('id')!;
         this.router.paramMap.subscribe((params) => {
             this.id = params.get('id');
-            console.log('Loading services for dashboard ' + this.id + '.');            
+            console.log('Loading services for dashboard ' + this.id + '.');
             this.reload();
         });
     }
@@ -72,9 +80,11 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     }
 
 
+    editable() {
+        return this.settingsService.editable;
+    }
 
     ngOnInit() {
-        // this.reload();
         setInterval(() => {
             if (this.refresh > 0) {
                 if (this.last_reload < Date.now() - this.refresh) {
@@ -101,38 +111,24 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     }
 
     reload() {
+        this.loading = true;
         if (this.id) {
-            this.dashboardService.get(this.id).subscribe((r) => {
+            this.dashboardService.get(this.id).subscribe({next: (r) => {
                 this.last_reload = Date.now();
                 console.log("Dashboard " + r.name + ' found. Loading services...');
                 this.dashboard = r;
-                this.serviceService.index(this.dashboard, this.sort, this.order).subscribe((r) => {
-                    // console.log("Dashboard " + r.name + ' details loaded.');
-                    this.dashboard.services = r;
+                this.serviceService.index(this.dashboard, this.settingsService.screenshots, this.sort, this.order).subscribe((r) => {
+                    console.log("Dashboard " + this.dashboard.name + ' services loaded. Screenshots: ' + this.settingsService.screenshots);
+                    this.services = r;
                 });
-            });
+            }, error: e => {
+                this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Could not load dashboard.');
+            }, complete: () => {
+                this.loading = false;
+            }});
         }
     }
 
-    editable() {
-        return this.settingsService.editable;
-    }
-
-    statusLevel(s: Service): string {
-        let status = 'unknown';
-        if (s.checked_at) {
-            if ((!s.http || s.http_path_last) && (!s.https || s.https_path_last) && this.pingGood(s)) {
-                status = 'good';
-            } else {
-                status = 'bad';
-            }
-        }
-        return status;
-    }
-
-    pingGood(s: Service) {
-        return !s.ping || s.ping_last > 0 && s.ping_last < s.ping_threshold;
-    }
 
     create() {
         let s = new Service();
@@ -143,10 +139,8 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         this.serviceService.create(this.dashboard, s).subscribe({
             next: r => {
                 this.toastrService.success('Please configure it!', 'Service created.');
-                this.dashboard.services.push(r);
-                // this.select(r)
+                this.services.push(r);
                 this.editing[r.id] = true;
-                // this.route.navigate(['dashboards', r.id]);
             }, error: e => {
                 if (!this.checkAccessDenied(e)) {
                     this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Service not created.');
@@ -155,30 +149,14 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         });
     }
 
-    update(s: Service) {
-        // if(this.dashboard){
-        this.serviceService.update(this.dashboard, s).subscribe({
-            next: d => {
-                this.toastrService.success('Service updated');
-                let i = this.dashboard.services.indexOf(s, 0);
-                this.dashboard.services[i] = d;
-                this.editing[d.id] = false;
-            }, error: e => {
-                if (!this.checkAccessDenied(e)) {
-                    this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Service not updated.');
-                }
-            }
-        });
-        // }
-    }
 
     delete(s: Service) {
         this.serviceService.delete(this.dashboard, s).subscribe({
             next: d => {
                 this.toastrService.success("It's service list has also been removed.", 'Service deleted');
-                let i = this.dashboard.services.indexOf(s, 0);
+                let i = this.services.indexOf(s, 0);
                 if (i >= 0) {
-                    this.dashboard.services.splice(i, 1);
+                    this.services.splice(i, 1);
                 }
             }, error: e => {
                 if (!this.checkAccessDenied(e)) {

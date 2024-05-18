@@ -17,6 +17,9 @@ export class SettingsService implements OnInit {
   // Set to true for easier debugging and development.
   // public editable: boolean = true;
   public editable: boolean = false;
+  public screenshots: boolean = true;
+  public displayMode: 'wide' | 'overlay' = 'overlay';
+
 
   constructor() {
     this.reload();

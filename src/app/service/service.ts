@@ -1,8 +1,9 @@
 export class Service {
 
     public id: string = '';
-    public host: string = '';
     public name: string = '';
+    public host: string = '';
+    public port: number = 0;
     public ping: boolean = false;
     public ping_threshold: number = 500;
     public ping_last: number = -1;

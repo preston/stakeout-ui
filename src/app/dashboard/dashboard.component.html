@@ -6,32 +6,49 @@
             <option *ngFor="let r of refresh_options" [value]="r.value" [selected]="r.value ==  refresh">
                 {{r.name}}</option>
         </select>
-        <span *ngIf="last_reload"> updated {{last_reload | amTimeAgo}}
-        </span>
-
     </div>
 
+
     <div class="btn-group float-end m-2">
-        <button class="btn btn-sm btn-secondary" role="button" (click)="reload()">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="button" name="dashboard_screenshots"
+                id="dashboard_screenshots" [(ngModel)]="settingsService.screenshots">
+            <label class="form-check-label" for="dashboard_screenshots">
+                Show Screenshots
+            </label>
+        </div>
+    </div>
+
+    <span class="btn-group float-end m-2">
+        <button class='btn btn-sm btn-primary' [class.active]="settingsService.displayMode == 'overlay'" role="button"
+            (click)="setDisplayMode('overlay')"><span class="bi bi-grid"></span> Overlay
+        </button>
+        <button class='btn btn-sm btn-primary' [class.active]="settingsService.displayMode == 'wide'" role="button"
+            (click)="setDisplayMode('wide')"><span class="bi bi-list"></span> Wide
+        </button>
+    </span>
+
+    <div class="btn-group float-end m-2">
+        <button class="btn btn-sm btn-primary" role="button" (click)="reload()">
             <span class="bi-arrow-clockwise"></span> Request Refresh</button>
     </div>
 
     <div class="btn-group float-end m-2">
-        <button class="btn btn-sm btn-secondary" role="button" (click)="sortBy('name')">
+        <button class="btn btn-sm btn-primary" role="button" (click)="sortBy('name')">
             <span class="bi bi-tag"></span>
             Name
             <span class="bi bi-arrow-down" *ngIf="sort == 'name' && order == 'asc'"></span>
             <span class="bi bi-arrow-up" *ngIf="sort == 'name' && order == 'desc'"></span>
         </button>
 
-        <button class="btn btn-sm btn-secondary" role="button" (click)="sortBy('ping')">
+        <button class="btn btn-sm btn-primary" role="button" (click)="sortBy('ping')">
             <span class="bi bi-hdd"></span>
             Ping
             <span class="bi bi-arrow-down" *ngIf="sort == 'ping' && order == 'asc'"></span>
             <span class="bi bi-arrow-up" *ngIf="sort == 'ping' && order == 'desc'"></span>
         </button>
 
-        <button class="btn btn-sm btn-secondary" role="button" (click)="sortBy('updated_at')">
+        <button class="btn btn-sm btn-primary" role="button" (click)="sortBy('updated_at')">
             <span class="bi bi-calendar"></span>
             Last Updated
             <span class="bi bi-arrow-down" *ngIf="sort == 'updated_at' && order == 'asc'"></span>
@@ -49,126 +66,17 @@
 
 
     </h1>
+    <span *ngIf="last_reload"> updated {{last_reload | amTimeAgo}}
+    </span>
     <div class="clearfix"></div>
 
-    <div class="m-2 card service align-top" *ngFor="let s of dashboard.services">
-        <div class="crop" [class.has_screenshot]="s.http_screenshot">
-            <img *ngIf="s.http_screenshot" [src]="'data:image/jpeg;base64, ' + s.http_screenshot" />
-            <div *ngIf="!s.http_screenshot" class="healthLevel">
-                <div [class]="statusLevel(s)"></div>
-            </div>
-        </div>
-        <div class="overview align-top ms-3 mt-2">
-            <!-- <div > -->
+    <span *ngIf="loading" id="loading" class="bi bi-alarm"></span>
 
-            <h4 class="align-center mb-0 pb-0">
-                @if(editable()){
-                <button class="btn btn-default float-end" role="button" *ngIf="!editing[s.id]"
-                    (click)="editing[s.id] = true"><span class="bi-pencil"></span></button>
+    <div class="m-2 service-card align-top" *ngFor="let s of services">
 
-                <button class="btn btn-default float-end " role="button" *ngIf="editing[s.id]"
-                    (click)="editing[s.id] = false"><span class="bi bi-x"></span> Close</button>
-                }
-                <span>{{s.name}}</span>
-            </h4>
-
-            <span class="badge mx-1 rounded-pill" *ngIf="s.ping" [class.text-bg-success]="pingGood(s)"
-                [class.text-bg-danger]="!pingGood(s)">Ping {{s.ping_last}}ms</span>
-            <!-- <span class="badge rounded-pill text-bg-danger" *ngIf="s.ping && !s.ping_last">Ping</span> -->
-            <a *ngIf="s.http && s.http_path_last" [href]="'http://' + s.host + s.http_path" target="_blank">
-                <span class="badge mx-1 rounded-pill text-bg-success">
-                    HTTP
-                </span>
-            </a>
-            <a *ngIf="s.http && !s.http_path_last" [href]="'http://' + s.host + s.http_path" target="_blank">
-                <span class="badge mx-1 rounded-pill text-bg-danger">HTTP</span>
-            </a>
-            <a *ngIf="s.https && s.https_path_last" [href]="'https://' + s.host + s.http_path" target="_blank">
-                <span class="badge mx-1 rounded-pill text-bg-success">HTTPS</span>
-            </a>
-            <a *ngIf="s.https && !s.https_path_last" [href]="'https://' + s.host + s.http_path" target="_blank">
-            <span class="badge mx-1 rounded-pill text-bg-danger">HTTPS</span>
-            </a>
-            <p class="checked_at ms-1" *ngIf="s.checked_at"> checked {{s.checked_at | amTimeAgo}}</p>
-            <p class="checked_at ms-1" *ngIf="!s.checked_at"> never checked</p>
-            <!-- </div> -->
-            <!-- <div *ngIf="editing[s.id]">
-
-            </div> -->
-        </div>
-
-        @if(editable()){
-        <div class="m-2" *ngIf="editing[s.id]">
-            <form (submit)="update(s)" role="form" class="form row">
-                <div class="col-sm-6">
-                    <label class="form-label" for="service_name">Name</label>
-                    <div class="input-group">
-                        <input class="form-control form-control-sm" type="text" name="service_name" [(ngModel)]="s.name"
-                            autofocus placeholder="My Service" required />
-                    </div>
-                    <label class="form-label mt-2" for="service_host">Host</label>
-                    <div class="input-group mb-2">
-                        <input class="form-control form-control-sm" type="text" name="service_host" [(ngModel)]="s.host"
-                            placeholder="example.com" required />
-                    </div>
-                    <div *ngIf="s.ping">
-                        <label class="form-label mt-2" for="service_ping_threshold">Ping Threshold (ms)</label>
-                        <div class="input-group mb-2">
-                            <input class="form-control form-control-sm" type="number" name="service_ping_threshold"
-                                [(ngModel)]="s.ping_threshold" required />
-                        </div>
-                    </div>
-                    <div *ngIf="s.http || s.https">
-                        <label class="form-label mt-2" for="service_http_path">HTTP(S) Path (optional)</label>
-                        <div class="input-group mb-2">
-                            <input class="form-control form-control-sm" type="text" name="service_http_path"
-                                [(ngModel)]="s.http_path" required />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <label class="form-label">Protocols</label>
-
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="service_http" id="service_http"
-                            [(ngModel)]="s.http">
-                        <label class="form-check-label" for="service_http">
-                            HTTP
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="service_https" id="service_https"
-                            [(ngModel)]="s.https">
-                        <label class="form-check-label" for="service_https">
-                            HTTPS
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="service_ping" id="service_ping"
-                            [(ngModel)]="s.ping">
-                        <label class="form-check-label" for="service_ping">
-                            ICMP Ping
-                        </label>
-                    </div>
-
-                    <div class="form-check" *ngIf="s.http || s.https">
-                        <hr>
-                        <input class="form-check-input" type="checkbox" name="service_http_preview"
-                            id="service_http_preview" [(ngModel)]="s.http_preview">
-                        <label class="form-check-label" for="service_http_preview">
-                            Capture HTTP(S) Preview?
-                        </label>
-                    </div>
-                </div>
-
-            </form>
-            <div class="btn-group float-start my-2">
-                <button class="btn btn-primary" role="button" *ngIf="editing[s.id]" (click)="update(s)"><span
-                        class="bi-save"></span> Save</button>
-            </div>
-            <button role="button" class="btn btn-danger float-end my-2" (click)="delete(s)"><span
-                    class="bi-trash"></span></button>
-        </div>
-        }
+        <button *ngIf="editable()" role="button" class="btn btn-sm btn-danger delete-button" (click)="delete(s)"><span
+            class="bi-trash"></span></button>
+        <service [dashboard]="dashboard" [service]="s"></service>
     </div>
+
 </div>

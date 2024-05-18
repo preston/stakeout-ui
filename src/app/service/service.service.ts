@@ -27,8 +27,8 @@ export class ServiceService extends BaseService {
     }
 
 
-    index(dashboard: Dashboard, sort: string = 'name', order: string = 'desc') {
-        let params = new HttpParams().set('sort', sort).set('order', order);
+    index(dashboard: Dashboard, screenshots: boolean, sort: string = 'name', order: string = 'desc') {
+        let params = new HttpParams().set('sort', sort).set('order', order).set('screenshots', screenshots);
         let services = this.http.get<Service[]>(this.url(dashboard), { headers: this.headers(), params: params }).pipe(map(res => res));
         return services;
     }
