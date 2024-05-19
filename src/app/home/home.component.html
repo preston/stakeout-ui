@@ -13,16 +13,17 @@
                         <a class="" role="button" (click)="sortBy('name')">
                             <span class="bi bi-arrow-down" *ngIf="sort == 'name' && order == 'asc'"></span>
                             <span class="bi bi-arrow-up" *ngIf="sort == 'name' && order == 'desc'"></span>
-                            </a>
-            
-                        Dashboards
+                            Dashboards
+                        </a>
+
                         @if(editable()) {
                         <button class="ms-1 btn btn-sm btn-primary " role="button " (click)="create() "><span
                                 class="bi-plus-circle"></span> Add</button>
                         }
                     </h4>
                     <ul class="list-unstyled" id="dashboards_list">
-                        <li class="my-2" *ngFor="let d of dashboards" [routerLink]="['/dashboards', d.id]" [routerLinkActive]="'active'" role="button">
+                        <li class="my-2" *ngFor="let d of dashboards" [routerLink]="['/dashboards', d.id]"
+                            [routerLinkActive]="'active'" role="button">
                             <!-- [routerLink]="'/dashboards/' + d.id" -->
                             @if(editable()) {
                             <button *ngIf="!editing[d.id]" class="me-1 btn btn-primary btn-sm" role="button"
@@ -53,7 +54,7 @@
             <button class="m-1 btn btn-sm btn-secondary float-end" [routerLink]="['/settings']"><span
                     class="bi bi-gear"></span></button>
             <button *ngIf="settingsService.editable" class="m-1 btn btn-sm btn-warning float-end" (click)="lock()"><span
-                class="bi bi-lock"></span> Lock Editing</button>
+                    class="bi bi-lock"></span> Lock Editing</button>
         </nav>
 
         <div id="content">

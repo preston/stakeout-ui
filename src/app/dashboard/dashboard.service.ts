@@ -1,7 +1,7 @@
 // Author: Preston Lee
 
 import { Injectable } from "@angular/core";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 
 import { BaseService } from "../base/base.service";
@@ -9,7 +9,6 @@ import { BaseService } from "../base/base.service";
 import { BackendService } from '../backend/backend.service';
 
 import { Dashboard } from '../dashboard/dashboard';
-import { Observable } from "rxjs";
 
 @Injectable()
 export class DashboardService extends BaseService {
@@ -27,12 +26,8 @@ export class DashboardService extends BaseService {
     }
 
     index(cache: boolean = true, sort: string = 'priority', order: string = 'desc') {
-        // let dashboards = (this.dashboards);
-        // if (dashboards && !cache) {
-            let dashboards = this.http.get<Dashboard[]>(this.url(), { headers: this.headers() }).pipe(map(res => res));
-        // } else {
-
-        // }
+        let params = new HttpParams().set('sort', sort).set('order', order)
+        let dashboards = this.http.get<Dashboard[]>(this.url(), { headers: this.headers(), params: params }).pipe(map(res => res));
         return dashboards;
     }
 

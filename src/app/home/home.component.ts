@@ -1,6 +1,6 @@
 // Author: Preston Lee
 
-import { Component, OnInit } from "@angular/core";
+import { Component, OnChanges, OnInit, SimpleChanges } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { BackendService } from "../backend/backend.service";
 import { Status } from "../status/status";
@@ -84,6 +84,9 @@ export class HomeComponent extends BaseComponent implements OnInit {
     reload() {
         this.dashboardService.index(false, this.sort, this.order).subscribe(d => {
             this.dashboards = d;
+            if (d.length > 0) {
+                this.route.navigate(['/dashboards', d[0].id]);
+            }
         });
     }
 
@@ -144,7 +147,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
         this.dashboardService.delete(dashboard).subscribe({
             next: d => {
                 this.toastrService.success("It's service list has also been removed.", 'Dashboard deleted');
-                console.log("Deleted dashboard: " + dashboard.name);                
+                console.log("Deleted dashboard: " + dashboard.name);
                 this.select(null);
                 let i = this.dashboards.indexOf(dashboard, 0);
                 if (i >= 0) {
