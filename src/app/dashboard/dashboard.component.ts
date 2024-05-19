@@ -1,6 +1,6 @@
 // Author: Preston Lee
 
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -25,12 +25,10 @@ import { ServiceComponent } from "../service/service.component";
     standalone: true,
     imports: [NgIf, NgFor, FormsModule, MomentModule, ServiceComponent]
 })
-export class DashboardComponent extends BaseComponent implements OnInit {
+export class DashboardComponent extends BaseComponent implements OnInit, OnDestroy {
 
     id: string | null = null;
-    // @Input() dashboard!: Dashboard;
     dashboard: Dashboard = new Dashboard();
-    // @Input() dashboards!: Dashboard[];
     services: Service[] = [];
     loading: boolean = true;
 
@@ -38,6 +36,10 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     perPage = '25';
     sort: 'name' | 'ping' | 'updated_at' = 'name';
     order: 'asc' | 'desc' = 'asc';
+
+    interval = setInterval(() => {
+        this.reloadIfNeeded();
+    }, 1000);
 
     editing: { [key: string]: boolean } = {};
 
@@ -81,6 +83,14 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         });
     }
 
+    ngOnDestroy(): void {
+        console.log('DASHBOARD DESTROY');
+        
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
+    }
+
     settings() {
         return this.settingsService.settings;
     }
@@ -91,23 +101,11 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     }
 
     ngOnInit() {
-        setInterval(() => {
-            if (this.refresh > 0) {
-                if (this.last_reload < Date.now() - this.refresh) {
-                    console.log("Polling.. (every " + this.refresh + "ms)");
-                    if (this.settingsService.editable) {
-                        console.log('Auto-refresh is disabled due to edit mode. Skipping poll.');
-                    } else {
-                        this.reload();
-                    }
-                } else {
-                    // console.log('Data is still fresh. Skipping poll..');
-                }
-            } else {
-                console.log('Auto-refresh is disabled by user setting. Skipping poll.');
+        console.log('DASHBOARD INIT');
 
-            }
-        }, 1000);
+        // this.interval = setInterval(() => {
+        //     this.reloadIfNeeded();
+        // }, 1000);
     }
 
     sortBy(sort: 'name' | 'ping' | 'updated_at') {
@@ -116,16 +114,34 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         this.reload();
     }
 
+    reloadIfNeeded() {
+        if (this.refresh > 0) {
+            if (this.last_reload < Date.now() - this.refresh) {
+                console.log(`Polling (every ${this.refresh}ms) ${this.dashboard.name}. Screenshots: ${this.settingsService.screenshots}...`);
+                if (this.settingsService.editable) {
+                    console.log('Auto-refresh is disabled due to edit mode. Skipping poll.');
+                } else {
+                    this.reload();
+                }
+            } else {
+                // console.log('Data is still fresh. Skipping poll..');
+            }
+        } else {
+            console.log('Auto-refresh is disabled by user setting. Skipping poll.');
+            // console.log(this.refresh);
+        }
+    }
+
     reload() {
         this.loading = true;
         if (this.id) {
             this.dashboardService.get(this.id).subscribe({
                 next: (r) => {
                     this.last_reload = Date.now();
-                    console.log("Dashboard " + r.name + ' found. Loading services...');
+                    // console.log("Dashboard " + r.name + ' found. Loading services...');
                     this.dashboard = r;
                     this.serviceService.index(this.dashboard, this.settingsService.screenshots, this.sort, this.order).subscribe((r) => {
-                        console.log("Dashboard " + this.dashboard.name + ' services loaded. Screenshots: ' + this.settingsService.screenshots);
+                        // console.log("Dashboard " + this.dashboard.name + ' services loaded. Screenshots: ' + this.settingsService.screenshots);
                         this.services = r;
                     });
                 }, error: e => {

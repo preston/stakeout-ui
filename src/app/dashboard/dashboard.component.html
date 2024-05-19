@@ -3,7 +3,7 @@
     <div class="float-end m-2">
         <!-- <label for="refresh">Auto-Refresh</label> -->
         <select class="form-control form-control-sm" [(ngModel)]="refresh" name="refresh" [disabled]="editable()">
-            <option *ngFor="let r of refresh_options" [value]="r.value" [selected]="r.value ==  refresh">
+            <option *ngFor="let r of refresh_options" [ngValue]="r.value" [selected]="r.value == refresh">
                 {{r.name}}</option>
         </select>
     </div>
