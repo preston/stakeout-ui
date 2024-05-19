@@ -1,3 +1,5 @@
+// Author: Preston Lee
+
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from "@angular/core";
 import { Service } from "./service";
 import { ServiceService } from "./service.service";

@@ -1,3 +1,5 @@
+// Author: Preston Lee
+
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ToasterConfigurationService } from './toaster/toaster.configuration.service';

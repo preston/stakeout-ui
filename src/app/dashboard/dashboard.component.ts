@@ -1,4 +1,6 @@
-import { Component, Input, OnInit } from "@angular/core";
+// Author: Preston Lee
+
+import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,7 +14,7 @@ import { FormsModule } from "@angular/forms";
 import { NgIf, NgFor } from "@angular/common";
 import { BaseComponent } from "./base.component";
 import { SettingsService } from "../settings/settings.service";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { ServiceComponent } from "../service/service.component";
 
 
@@ -42,7 +44,7 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     setDisplayMode(mode: 'wide' | 'overlay') {
         this.settingsService.displayMode = mode;
         console.log("Display mode set to " + this.settingsService.displayMode);
-        
+
     }
 
     refresh_options = [
@@ -68,10 +70,14 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         }
 
         // this.id = this.router.snapshot.paramMap.get('id')!;
-        this.router.paramMap.subscribe((params) => {
-            this.id = params.get('id');
-            console.log('Loading services for dashboard ' + this.id + '.');
-            this.reload();
+        this.router.paramMap.subscribe({
+            next: (params) => {
+                this.id = params.get('id');
+                console.log('Loading services for dashboard ' + this.id + '.');
+                this.reload();
+            }, error: e => {
+                this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Could not load dashboard, likely due to a network or server issue.');
+            }
         });
     }
 
@@ -113,19 +119,21 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     reload() {
         this.loading = true;
         if (this.id) {
-            this.dashboardService.get(this.id).subscribe({next: (r) => {
-                this.last_reload = Date.now();
-                console.log("Dashboard " + r.name + ' found. Loading services...');
-                this.dashboard = r;
-                this.serviceService.index(this.dashboard, this.settingsService.screenshots, this.sort, this.order).subscribe((r) => {
-                    console.log("Dashboard " + this.dashboard.name + ' services loaded. Screenshots: ' + this.settingsService.screenshots);
-                    this.services = r;
-                });
-            }, error: e => {
-                this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Could not load dashboard.');
-            }, complete: () => {
-                this.loading = false;
-            }});
+            this.dashboardService.get(this.id).subscribe({
+                next: (r) => {
+                    this.last_reload = Date.now();
+                    console.log("Dashboard " + r.name + ' found. Loading services...');
+                    this.dashboard = r;
+                    this.serviceService.index(this.dashboard, this.settingsService.screenshots, this.sort, this.order).subscribe((r) => {
+                        console.log("Dashboard " + this.dashboard.name + ' services loaded. Screenshots: ' + this.settingsService.screenshots);
+                        this.services = r;
+                    });
+                }, error: e => {
+                    this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Could not load dashboard.');
+                }, complete: () => {
+                    this.loading = false;
+                }
+            });
         }
     }
 

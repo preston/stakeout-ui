@@ -1,3 +1,5 @@
+// Author: Preston Lee
+
 import { Injectable } from "@angular/core";
 import { HttpHeaders } from '@angular/common/http';
 import { HttpClient } from '@angular/common/http';

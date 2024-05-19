@@ -1,3 +1,5 @@
+// Author: Preston Lee
+
 import { ToastrService } from "ngx-toastr";
 
 export class BaseComponent {
