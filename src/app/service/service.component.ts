@@ -75,8 +75,9 @@ export class ServiceComponent extends BaseComponent implements OnInit, OnChanges
         this.serviceService.update(this.dashboard, s).subscribe({
             next: d => {
                 this.toastrService.success('Service updated');
-                let i = this.dashboard.services.indexOf(s, 0);
-                this.dashboard.services[i] = d;
+                // let i = this.dashboard.services.indexOf(s, 0);
+                // this.dashboard.services[i] = d;
+                this.service = d;
                 this.editing = false;
             }, error: e => {
                 if (!this.checkAccessDenied(e)) {
