@@ -85,7 +85,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
 
     ngOnDestroy(): void {
         console.log('DASHBOARD DESTROY');
-        
+
         if (this.interval) {
             clearInterval(this.interval);
         }
@@ -140,9 +140,16 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
                     this.last_reload = Date.now();
                     // console.log("Dashboard " + r.name + ' found. Loading services...');
                     this.dashboard = r;
-                    this.serviceService.index(this.dashboard, this.settingsService.screenshots, this.sort, this.order).subscribe((r) => {
-                        // console.log("Dashboard " + this.dashboard.name + ' services loaded. Screenshots: ' + this.settingsService.screenshots);
-                        this.services = r;
+                    this.serviceService.index(this.dashboard, this.settingsService.screenshots, this.sort, this.order).subscribe({
+                        next: (r) => {
+                            // console.log("Dashboard " + this.dashboard.name + ' services loaded. Screenshots: ' + this.settingsService.screenshots);
+                            this.services = r;
+                        }, error: e => {
+                            this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Could not load services.');
+                            console.log(e);
+
+                        }
+
                     });
                 }, error: e => {
                     this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Could not load dashboard.');
