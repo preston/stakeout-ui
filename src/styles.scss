@@ -9,3 +9,9 @@ h1,h2,h3,h4,h5,h5 {
     font-family: 'skycapp';
     // color: #aaa;
 }
+
+
+.ngx-toastr {
+    // Override the default toastr style since we use a dark theme.
+    box-shadow: 0 0 12px #000000 !important;
+}

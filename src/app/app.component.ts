@@ -2,7 +2,6 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { ToasterConfigurationService } from './toaster/toaster.configuration.service';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -14,7 +13,7 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
 
-  constructor(protected http: HttpClient, private toasterConfigurationService: ToasterConfigurationService) {
+  constructor(protected http: HttpClient) {
 		console.log("AppComponent has been initialized to establish router element.");
   }
 }

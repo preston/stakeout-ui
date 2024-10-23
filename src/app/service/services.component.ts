@@ -1,7 +1,6 @@
 // Author: Preston Lee
 
 import { Component, OnInit } from "@angular/core";
-import { ToasterConfigurationService } from "../toaster/toaster.configuration.service";
 import { Service } from "./service";
 import { ServiceService } from "./service.service";
 
@@ -14,8 +13,7 @@ import { ServiceService } from "./service.service";
 export class ServicesComponent implements OnInit {
 
     public services: Service[] = [];
-    constructor(private serviceService: ServiceService,
-		public toasterConfigurationService: ToasterConfigurationService,
+    constructor(private serviceService: ServiceService
 ) {
 	}
 	ngOnInit() {
@@ -23,11 +21,5 @@ export class ServicesComponent implements OnInit {
 	}
 
     reload() {
-		// this.serviceService.index().subscribe(d => {
-		// 	this.services = d;
-		// });
-		// this.backendService.status().subscribe(d => {
-		// 	this.status = d;
-		// });
 	}
 }

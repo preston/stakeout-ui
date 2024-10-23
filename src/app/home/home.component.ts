@@ -7,7 +7,7 @@ import { Status } from "../status/status";
 import { Dashboard } from "../dashboard/dashboard";
 import { DashboardService } from "../dashboard/dashboard.service";
 import { v4 as uuidv4 } from 'uuid';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { MomentModule } from "ngx-moment";
 import { DashboardComponent } from "../dashboard/dashboard.component";
 import { FormsModule } from "@angular/forms";
@@ -45,7 +45,8 @@ export class HomeComponent extends BaseComponent implements OnInit {
         protected backendService: BackendService,
         protected dashboardService: DashboardService,
         protected override toastrService: ToastrService,
-        protected route: Router,
+        protected router: Router,
+        protected activatedRoute: ActivatedRoute,
         protected settingsService: SettingsService) {
         super(toastrService);
 
@@ -84,19 +85,27 @@ export class HomeComponent extends BaseComponent implements OnInit {
     reload() {
         this.dashboardService.index(false, this.sort, this.order).subscribe(d => {
             this.dashboards = d;
-            if (d.length > 0) {
-                this.route.navigate(['/dashboards', d[0].id]);
+
+            // console.log("ROUTER: " +this.router.url);
+            // console.log("PATH: " +this.activatedRoute.root.snapshot.url);
+            if (this.router.url == '/') {
+                this.router.navigate(['/dashboards', d[0].id]);
             }
+            // this.activatedRoute.url.subscribe(u => {
+            //     console.log("URL: "+ u);                
+            // });
+            // if (d.length > 0) {
+
         });
     }
 
     select(dashboard: Dashboard | null) {
         if (dashboard) {
             this.dashboard = dashboard;
-            this.route.navigate(['/dashboards', dashboard.id]);
+            this.router.navigate(['/dashboards', dashboard.id]);
         } else {
             this.dashboard = null;
-            this.route.navigate(['/']);
+            this.router.navigate(['/']);
         }
     }
 

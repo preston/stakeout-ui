@@ -11,7 +11,6 @@ import { withInterceptorsFromDi, provideHttpClient } from '@angular/common/http'
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { ServiceService } from './app/service/service.service';
 import { DashboardService } from './app/dashboard/dashboard.service';
-import { ToasterConfigurationService } from './app/toaster/toaster.configuration.service';
 import { BackendService } from './app/backend/backend.service';
 import { SettingsService } from './app/settings/settings.service';
 
@@ -19,9 +18,8 @@ import { SettingsService } from './app/settings/settings.service';
 bootstrapApplication(AppComponent, {
     providers: [
         importProvidersFrom(BrowserModule, FormsModule, // For Toaster
-            ToastrModule.forRoot(), MomentModule, AppRoutingModule),
+            ToastrModule.forRoot({positionClass: 'toast-bottom-right'}), MomentModule, AppRoutingModule),
         BackendService,
-        ToasterConfigurationService,
         DashboardService,
         ServiceService,
         SettingsService,
