@@ -25,7 +25,7 @@ import { SettingsService } from "../settings/settings.service";
 export class HomeComponent extends BaseComponent implements OnInit {
 
 
-    public title: string = (window as any)["STAKEOUT_TITLE"];
+    public title: string = (window as any)["STAKEOUT_UI_TITLE"];
 
     sidebarActive: boolean = true;
 

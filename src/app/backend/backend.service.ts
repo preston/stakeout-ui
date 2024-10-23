@@ -18,7 +18,7 @@ export class BackendService {
 	// public token: string | null = null;
 
 	constructor(protected http: HttpClient, protected settingsService: SettingsService) {
-		this.url = (window as any)["STAKEOUT_SERVER_URL"];
+		this.url = (window as any)["STAKEOUT_UI_SERVER_URL"];
 	}
 
 

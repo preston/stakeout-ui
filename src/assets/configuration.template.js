@@ -1,5 +1,5 @@
 (function(window) {
     // Environment variables
-    window["STAKEOUT_SERVER_URL"] = "${STAKEOUT_SERVER_URL}";
-    window["STAKEOUT_TITLE"] = "${STAKEOUT_TITLE}";
+    window["STAKEOUT_UI_SERVER_URL"] = "${STAKEOUT_UI_SERVER_URL}";
+    window["STAKEOUT_UI_TITLE"] = "${STAKEOUT_UI_TITLE}";
 })(this);
