@@ -57,7 +57,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
         { name: '1 Hour Refresh', value: 1000 * 60 * 60 },
     ]
 
-    refresh: number = 0;
+    refresh: number = this.refresh_options[1].value;
     last_reload: number = 0;
 
     constructor(
