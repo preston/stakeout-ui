@@ -6,9 +6,13 @@ $drop_shadow: 0 20px 20px rgba(0,0,0,.2);
         // background-color: rgba(0, 0, 0, .2);
     }
     .title {
+        display: block;
         padding: 8px;
         background-color: rgba(0, 0, 0, .2);
         font-size: 1.2rem;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
         // text-shadow: 0 2px 2px #000;
     }
     // background: url(/assets/images/backgrounds/dashboards.jpg) no-repeat center center fixed;
