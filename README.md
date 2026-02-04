@@ -4,7 +4,7 @@ The Stakeout UI is web-based frontend for [Stakeout Server](https://github.com/p
 
 ## Developer Quick Start
 
-This is an [Angular](https://angular.io) project using `ng` [@angular/cli](https://cli.angular.io/) as the build system, [SCSS](http://sass-lang.com) for CSS and [Bootstrap](https://getbootstrap.com/) for layout. `npm` is the package manager. Assuming you already have node installed via [`nvm`](https://github.com/nvm-sh/nvm) or similar, run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files. The following must be set:
+This project uses [Angular](https://angular.io) [Bootstrap](https://getbootstrap.com/) for layout and [SCSS](http://sass-lang.com) for CSS. `npm` is the package manager. Assuming you already have node installed via [`nvm`](https://github.com/nvm-sh/nvm) or similar, set the follow environment variables and run `npm run start`. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files. The following must be set:
 
 	export STAKEOUT_UI_SERVER_URL=http://localhost:3000
 	export STAKEOUT_UI_TITLE="My Stakeout"
@@ -26,11 +26,10 @@ In your container hosting environment, point an instance at your Stakeout Server
 
 ```sh
 docker run -d -p 9000:80 --restart unless-stopped \
--e "STAKEOUT_UI_SERVER_URL=http://localhost:3000" 
+-e "STAKEOUT_UI_SERVER_URL=http://localhost:3000" \
 -e "STAKEOUT_UI_TITLE=My Stakeout" \
 p3000/stakeout-ui:latest
 ```
-
 
 # Attribution
 
