@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { BackendService } from '../backend/backend.service';
+import { ThemeType } from './settings';
 
 @Component({
   selector: 'app-settings',
@@ -46,6 +47,16 @@ export class SettingsComponent {
   }
   set developer(v: boolean) {
     this.settingsService.updateSettings({ developer: v });
+  }
+
+  themeTypes(): typeof ThemeType {
+    return ThemeType;
+  }
+
+  themePreferenceChanged(value: ThemeType): void {
+    this.settingsService.updateSettings({ theme_preferred: value });
+    this.settingsService.setEffectiveTheme();
+    this.settingsService.saveSettings();
   }
 
   reload(): void {

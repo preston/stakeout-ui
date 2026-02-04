@@ -1,16 +1,16 @@
-<router-outlet></router-outlet>
-<footer class="fixed-bottom text-center">
+<div class="app-container" [attr.data-bs-theme]="settingsService.theme_effective()">
+  <router-outlet></router-outlet>
+  <footer class="fixed-bottom text-center">
     <!-- <p class="m-1">
         This service monitoring tool provides visual representation on the status of sets of heterogeneous web services.
     </p> -->
 
     <span class="skycapp-brand">Powered by </span>
     <a role="link" href="https://www.skycapp.com">
-        <span class="skycapp-symbol">z</span>
         <span class="skycapp-brand">Skycapp</span>
-        <span class="skycapp-symbol">e</span>
     </a>
-    <span class="skycapp-brand"> application delivery and operations platform. Copyright © 2011-2024
+    <span class="skycapp-brand"> application delivery and operations platform. Copyright © 2011-2026
         Skycapp. All rights reserved.</span>
 
-</footer>
+  </footer>
+</div>

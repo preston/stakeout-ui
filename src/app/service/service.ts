@@ -6,9 +6,6 @@ export class Service {
     public name: string = '';
     public host: string = '';
     public port: number = 0;
-    public ping: boolean = false;
-    public ping_threshold: number = 500;
-    public ping_last: number = -1;
     public http: boolean = false;
     public https: boolean = false;
     public http_path: string = '';

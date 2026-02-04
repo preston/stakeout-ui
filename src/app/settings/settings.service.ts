@@ -1,7 +1,7 @@
 // Author: Preston Lee
 
 import { Injectable, signal, computed } from '@angular/core';
-import { Settings } from './settings';
+import { Settings, ThemeType } from './settings';
 
 @Injectable()
 export class SettingsService {
@@ -15,9 +15,35 @@ export class SettingsService {
   readonly editable = signal(false);
   readonly screenshots = signal(true);
   readonly displayMode = signal<'wide' | 'overlay'>('overlay');
+  readonly theme_effective = signal<ThemeType>(ThemeType.LIGHT);
 
   constructor() {
     this.reload();
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', ({ matches }) => {
+          if (this.settings().theme_preferred === ThemeType.AUTOMATIC) {
+            this.theme_effective.set(matches ? ThemeType.DARK : ThemeType.LIGHT);
+          }
+        });
+    }
+  }
+
+  setEffectiveTheme(): void {
+    const preferred = this.settings().theme_preferred;
+    if (preferred === ThemeType.AUTOMATIC) {
+      if (
+        typeof window !== 'undefined' &&
+        window.matchMedia?.('(prefers-color-scheme: dark)').matches
+      ) {
+        this.theme_effective.set(ThemeType.DARK);
+      } else {
+        this.theme_effective.set(ThemeType.LIGHT);
+      }
+    } else {
+      this.theme_effective.set(preferred);
+    }
   }
 
   reload(): void {
@@ -31,7 +57,11 @@ export class SettingsService {
     const tmp = localStorage.getItem(SettingsService.SETTINGS_KEY);
     if (tmp) {
       try {
-        this.settingsSignal.set(JSON.parse(tmp));
+        const parsed = JSON.parse(tmp);
+        if (parsed.theme_preferred == null) {
+          parsed.theme_preferred = Settings.DEFAULT_THEME;
+        }
+        this.settingsSignal.set(parsed);
       } catch (e) {
         console.warn(
           'Settings could not be parsed and are likely not valid JSON. They will be ignored.',
@@ -41,6 +71,7 @@ export class SettingsService {
     } else {
       this.settingsSignal.set(new Settings());
     }
+    this.setEffectiveTheme();
   }
 
   forceResetToDefaults(): void {

@@ -1,8 +1,8 @@
 @use '../../skycapp.scss' as *;
 
 h1 {
-    color: #aaa;
-    display: inline;
+    // color: #aaa;
+    // display: inline;
 }
 
 
@@ -11,10 +11,6 @@ h1 {
 
     animation: 2s infinite;
     animation-name: pulse;
-}
-
-select {
-    // display: inline-flex;
 }
 
 .service-card {

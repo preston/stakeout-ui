@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-sm-12 mb-4">
       <h1>
-        <button class="btn btn-md btn-outline-dark" (click)="back()">
+        <button class="btn btn-md btn-outline-secondary" (click)="back()">
           <span class="bi bi-arrow-left"></span> Back
         </button>
         &nbsp;
@@ -34,7 +34,21 @@
       </div>
     </div>
     <div class="col-sm-6">
-      <h4><span class="bi bi-code-slash"></span> Advanced</h4>
+      <h4><span class="bi bi-palette"></span> Appearance</h4>
+      <div class="form-floating mt-4">
+        <select
+          class="form-select form-select-sm"
+          name="theme"
+          [ngModel]="settingsService.settings().theme_preferred"
+          (ngModelChange)="themePreferenceChanged($event)"
+        >
+          <option [value]="themeTypes().AUTOMATIC">Automatic (system)</option>
+          <option [value]="themeTypes().LIGHT">Light</option>
+          <option [value]="themeTypes().DARK">Dark</option>
+        </select>
+        <label for="theme">Theme</label>
+      </div>
+      <h4 class="mt-4"><span class="bi bi-code-slash"></span> Advanced</h4>
       <div class="form-check mt-3 ms-1">
         <input
           id="experimental_switch"

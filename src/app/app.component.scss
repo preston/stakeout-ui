@@ -1,7 +1,20 @@
+// Fill viewport and use Bootstrap theme background so light/dark switch works
+:host {
+    display: block;
+    min-height: 100vh;
+}
+
+.app-container {
+    min-height: 100vh;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
 footer {
     z-index: -1;
-    p,
+    color: var(--bs-body-color);
+
     a {
-        color: #333;
+        color: var(--bs-link-color);
     }
 }

@@ -55,8 +55,7 @@ export class ServiceComponent extends BaseComponent {
     if (s.checked_at) {
       if (
         (!s.http || s.http_path_last) &&
-        (!s.https || s.https_path_last) &&
-        this.pingGood(s)
+        (!s.https || s.https_path_last)
       ) {
         status = 'good';
       } else {
@@ -64,10 +63,6 @@ export class ServiceComponent extends BaseComponent {
       }
     }
     return status;
-  }
-
-  pingGood(s: Service): boolean {
-    return !s.ping || (s.ping_last > 0 && s.ping_last < s.ping_threshold);
   }
 
   update(s: Service): void {

@@ -50,7 +50,7 @@ export class DashboardComponent extends BaseComponent {
   readonly dashboard = signal<Dashboard>(new Dashboard());
   readonly services = signal<Service[]>([]);
   readonly loading = signal(true);
-  readonly sort = signal<'name' | 'ping' | 'updated_at'>('name');
+  readonly sort = signal<'name' | 'updated_at'>('name');
   readonly order = signal<'asc' | 'desc'>('asc');
   readonly editing = signal<Record<string, boolean>>({});
   readonly refresh = signal(REFRESH_OPTIONS[1].value);
@@ -92,7 +92,7 @@ export class DashboardComponent extends BaseComponent {
     this.settingsService.setDisplayMode(mode);
   }
 
-  sortBy(sort: 'name' | 'ping' | 'updated_at'): void {
+  sortBy(sort: 'name' | 'updated_at'): void {
     this.sort.set(sort);
     this.order.update((o) => (o === 'asc' ? 'desc' : 'asc'));
     this.reload();
