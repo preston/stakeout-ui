@@ -16,6 +16,9 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
+trigger:
+  branch:
+    - master
 ---
 kind: pipeline
 name: latest-arm64
@@ -34,6 +37,9 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
+trigger:
+  branch:
+    - master
 ---
 name: manifest
 kind: pipeline
