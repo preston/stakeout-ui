@@ -1,0 +1,12 @@
+.angular
+.cursor
+.dockerignore
+.gitattributes
+.git
+.gitignore
+.vscode/
+
+Dockerfile
+doc/
+dist/
+node_modules/
