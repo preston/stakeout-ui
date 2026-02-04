@@ -1,72 +1,102 @@
 // Author: Preston Lee
 
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { SettingsService } from './settings.service';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { BackendService } from '../backend/backend.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  styleUrl: './settings.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent {
+  protected readonly toastrService = inject(ToastrService);
+  protected readonly settingsService = inject(SettingsService);
+  protected readonly backendService = inject(BackendService);
+  protected readonly location = inject(Location);
+  protected readonly router = inject(Router);
 
-  constructor(protected toastrService: ToastrService,
-    protected settingsService: SettingsService,
-    protected backendService: BackendService,
-    public location: Location,
-    protected router: Router,
-  ) {
+  get username(): string {
+    return this.settingsService.settings().cds_username;
+  }
+  set username(v: string) {
+    this.settingsService.updateSettings({ cds_username: v });
+  }
+  get password(): string {
+    return this.settingsService.settings().cds_password;
+  }
+  set password(v: string) {
+    this.settingsService.updateSettings({ cds_password: v });
+  }
+  get experimental(): boolean {
+    return this.settingsService.settings().experimental;
+  }
+  set experimental(v: boolean) {
+    this.settingsService.updateSettings({ experimental: v });
+  }
+  get developer(): boolean {
+    return this.settingsService.settings().developer;
+  }
+  set developer(v: boolean) {
+    this.settingsService.updateSettings({ developer: v });
   }
 
-  ngOnInit() {
-    this.reload();
-  }
-
-  reload() {
+  reload(): void {
     this.settingsService.reload();
   }
 
-  editable() {
-    return this.settingsService.editable;
+  editable(): boolean {
+    return this.settingsService.editable();
   }
 
-  unlock() {
+  unlock(): void {
     this.backendService.test().subscribe({
-      next: res => {
-        this.toastrService.success("Auto-refresh will be disabled while in edit mode.", "Authentication Successful");
-        this.settingsService.editable = true;
+      next: () => {
+        this.toastrService.success(
+          'Auto-refresh will be disabled while in edit mode.',
+          'Authentication Successful'
+        );
+        this.settingsService.setEditable(true);
         this.router.navigate(['/']);
-      }, error: err => {
-        this.toastrService.error("Failed to authenticate. Check username, password, and Internet connection.", "Test Failed");
-      }
+      },
+      error: () => {
+        this.toastrService.error(
+          'Failed to authenticate. Check username, password, and Internet connection.',
+          'Test Failed'
+        );
+      },
     });
-
   }
 
-  lock() {
-    this.settingsService.editable = false;
+  lock(): void {
+    this.settingsService.setEditable(false);
   }
 
-  save() {
+  save(): void {
     this.settingsService.saveSettings();
-    this.toastrService.success("Settings are local to your browser only.", "Settings Saved");
+    this.toastrService.success(
+      'Settings are local to your browser only.',
+      'Settings Saved'
+    );
     this.back();
   }
 
-  restore() {
+  restore(): void {
     this.settingsService.forceResetToDefaults();
-    this.toastrService.success("All settings have been restored to their defaults.", "Settings Restored");
+    this.toastrService.success(
+      'All settings have been restored to their defaults.',
+      'Settings Restored'
+    );
   }
 
-  back() {
+  back(): void {
     this.location.back();
   }
-
 }

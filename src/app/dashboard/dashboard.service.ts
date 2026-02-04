@@ -1,54 +1,54 @@
 // Author: Preston Lee
 
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-
-import { BaseService } from "../base/base.service";
-
-import { BackendService } from '../backend/backend.service';
-
+import { BaseService } from '../base/base.service';
 import { Dashboard } from '../dashboard/dashboard';
 
 @Injectable()
 export class DashboardService extends BaseService {
+  static readonly PATH = '/dashboards';
 
-    public static PATH: string = '/dashboards';
+  url(): string {
+    return this.backendService.url + DashboardService.PATH;
+  }
 
-    // public dashboards: Dashboard[] | null = null;
+  index(cache = true, sort = 'priority', order = 'desc') {
+    const params = new HttpParams()
+      .set('sort', sort)
+      .set('order', order);
+    return this.http
+      .get<Dashboard[]>(this.url(), {
+        headers: this.headers(),
+        params,
+      })
+      .pipe(map((res) => res));
+  }
 
-    constructor(backendService: BackendService, http: HttpClient) {
-        super(backendService, http);
-    }
+  get(id: string) {
+    return this.http
+      .get<Dashboard>(this.url() + '/' + id, { headers: this.headers() })
+      .pipe(map((res) => res));
+  }
 
-    url(): string {
-        return this.backendService.url + DashboardService.PATH;
-    }
+  create(dashboard: Dashboard) {
+    return this.http
+      .post<Dashboard>(this.url(), { dashboard }, { headers: this.headers() })
+      .pipe(map((res) => res));
+  }
 
-    index(cache: boolean = true, sort: string = 'priority', order: string = 'desc') {
-        let params = new HttpParams().set('sort', sort).set('order', order)
-        let dashboards = this.http.get<Dashboard[]>(this.url(), { headers: this.headers(), params: params }).pipe(map(res => res));
-        return dashboards;
-    }
+  update(dashboard: Dashboard) {
+    return this.http
+      .put<Dashboard>(this.url() + '/' + dashboard.id, { dashboard }, { headers: this.headers() })
+      .pipe(map((res) => res));
+  }
 
-    get(id: string) {
-        let platform = this.http.get<Dashboard>(this.url() + '/' + id, { headers: this.headers() }).pipe(map(res => res));
-        return platform;
-    }
-
-
-    create(dashboard: Dashboard) {
-        let obs = this.http.post<Dashboard>(this.url(), { 'dashboard': dashboard }, { headers: this.headers() }).pipe(map(res => res));
-        return obs;
-    }
-
-    update(dashboard: Dashboard) {
-        let obs = this.http.put<Dashboard>(this.url() + '/' + dashboard.id, { 'dashboard': dashboard }, { headers: this.headers() }).pipe(map(res => res));
-        return obs;
-    }
-
-    delete(dashboard: Dashboard) {
-        let obs = this.http.delete<Dashboard>(this.url() + '/' + dashboard.id, { headers: this.headers() }).pipe(map(res => res));
-        return obs;
-    }
+  delete(dashboard: Dashboard) {
+    return this.http
+      .delete<Dashboard>(this.url() + '/' + dashboard.id, {
+        headers: this.headers(),
+      })
+      .pipe(map((res) => res));
+  }
 }

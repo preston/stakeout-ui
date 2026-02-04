@@ -1,16 +1,19 @@
 // Author: Preston Lee
 
-import { ToastrService } from "ngx-toastr";
+import { inject } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 
 export class BaseComponent {
+  protected readonly toastrService = inject(ToastrService);
 
-    constructor(protected toastrService: ToastrService) { 
+  checkAccessDenied(e: { status?: number }): boolean {
+    if (e.status === 401) {
+      this.toastrService.error(
+        'Check your credentials and try again.',
+        'Access denied.'
+      );
+      return true;
     }
-    
-    checkAccessDenied(e: any): boolean {
-        if (e.status == 401) {
-            this.toastrService.error('Check your credentials and try again.', 'Access denied.');
-            return true
-        } else { return false; }
-    }
+    return false;
+  }
 }

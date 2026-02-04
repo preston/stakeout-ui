@@ -1,4 +1,4 @@
-FROM node:22-alpine as builder
+FROM node:25-alpine as builder
 LABEL maintainer="preston.lee@prestonlee.com"
 
 # Install dependencies first so they layer can be cached across builds.
@@ -22,8 +22,8 @@ WORKDIR /usr/share/nginx/html
 # Remove any default nginx content
 RUN rm -rf *
 
-# Copy build from "builder" stage, as well as runtime configuration script public folder
-COPY --from=builder /app/dist/stakeout-ui .
+# Copy build from "builder" stage (application builder outputs to browser/ subdir)
+COPY --from=builder /app/dist/stakeout-ui/browser .
 
 # CMD ["./configure-from-environment.sh", "&&", "exec", "nginx", "-g", "'daemon off;'"]
 CMD envsubst < assets/configuration.template.js > assets/configuration.js  && exec nginx -g 'daemon off;'

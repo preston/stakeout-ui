@@ -1,70 +1,82 @@
 // Author: Preston Lee
 
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { Settings } from './settings';
-import { Router } from '@angular/router';
-import { Location } from '@angular/common';
 
 @Injectable()
-export class SettingsService implements OnInit {
+export class SettingsService {
+  static readonly SETTINGS_KEY = 'stakeout_settings';
+  static readonly FORCE_RESET_KEY = 'stakeout_settings_force_reset';
 
-  public static SETTINGS_KEY: string = "stakeout_settings";
-  public static FORCE_RESET_KEY: string = "stakeout_settings_force_reset";
+  private readonly settingsSignal = signal<Settings>(new Settings());
+  readonly settings = this.settingsSignal.asReadonly();
 
-  public settings: Settings = new Settings;
-  public force_reset: boolean = false;
-
-  // Set to true for easier debugging and development.
-  // public editable: boolean = true;
-  public editable: boolean = false;
-  public screenshots: boolean = true;
-  public displayMode: 'wide' | 'overlay' = 'overlay';
-
+  readonly forceReset = signal(false);
+  readonly editable = signal(false);
+  readonly screenshots = signal(true);
+  readonly displayMode = signal<'wide' | 'overlay'>('overlay');
 
   constructor() {
     this.reload();
   }
 
-  ngOnInit() {
-  }
-
-  reload() {
-    this.force_reset = (localStorage.getItem(SettingsService.FORCE_RESET_KEY) == 'true' ? true : false);
-    if (this.force_reset) {
+  reload(): void {
+    this.forceReset.set(
+      localStorage.getItem(SettingsService.FORCE_RESET_KEY) === 'true'
+    );
+    if (this.forceReset()) {
       this.forceResetToDefaults();
+      return;
     }
-    let tmp = localStorage.getItem(SettingsService.SETTINGS_KEY);
+    const tmp = localStorage.getItem(SettingsService.SETTINGS_KEY);
     if (tmp) {
       try {
-        this.settings = JSON.parse(tmp)
+        this.settingsSignal.set(JSON.parse(tmp));
       } catch (e) {
-        console.log("Settings could not be parsed and are likely not valid JSON. They will be ignored.");
-        console.log(e);
+        console.warn(
+          'Settings could not be parsed and are likely not valid JSON. They will be ignored.',
+          e
+        );
       }
     } else {
-      this.settings = new Settings();
+      this.settingsSignal.set(new Settings());
     }
   }
 
-  forceResetToDefaults() {
+  forceResetToDefaults(): void {
     localStorage.clear();
-    this.settings = new Settings();
-    this.force_reset = false;
+    this.settingsSignal.set(new Settings());
+    this.forceReset.set(false);
     this.saveSettings();
     this.reload();
-    console.log("All application settings have been restored to their defaults.");
+    console.log(
+      'All application settings have been restored to their defaults.'
+    );
   }
 
-  saveSettings() {
-    localStorage.setItem(SettingsService.SETTINGS_KEY, JSON.stringify(this.settings));
-    console.log("Your settings have been saved to local browser storage on this device. They will not be sync'd to any other system, even if your browser supports such features.");
+  saveSettings(): void {
+    localStorage.setItem(
+      SettingsService.SETTINGS_KEY,
+      JSON.stringify(this.settingsSignal())
+    );
+    console.log(
+      'Your settings have been saved to local browser storage on this device.'
+    );
   }
 
-  // clearLocalStorage() {
-  //   localStorage.clear();
-  //   this.forceResetToDefaults();
-  //   this.reload();
-  //   console.log("All application settings have been restored to their defaults.");
-  // }
+  setEditable(value: boolean): void {
+    this.editable.set(value);
+  }
 
+  setScreenshots(value: boolean): void {
+    this.screenshots.set(value);
+  }
+
+  setDisplayMode(mode: 'wide' | 'overlay'): void {
+    this.displayMode.set(mode);
+  }
+
+  updateSettings(update: Partial<Settings>): void {
+    this.settingsSignal.update((s) => ({ ...s, ...update }));
+  }
 }

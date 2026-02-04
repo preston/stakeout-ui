@@ -6,8 +6,8 @@ import { ServiceService } from "./service.service";
 
 @Component({
     selector: 'services',
-    templateUrl: 'services.component.html',
-    styleUrls: ['services.component.scss'],
+    templateUrl: './services.component.html',
+    styleUrl: './services.component.scss',
     standalone: true,
 })
 export class ServicesComponent implements OnInit {

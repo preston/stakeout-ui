@@ -1,90 +1,91 @@
 // Author: Preston Lee
 
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from "@angular/core";
-import { Service } from "./service";
-import { ServiceService } from "./service.service";
-import { CommonModule } from "@angular/common";
-import { SettingsService } from "../settings/settings.service";
-import { BaseComponent } from "../dashboard/base.component";
-import { ToastrService } from "ngx-toastr";
-import { Dashboard } from "../dashboard/dashboard";
-import { FormsModule } from "@angular/forms";
-import { MomentModule } from "ngx-moment";
+import {
+  Component,
+  input,
+  output,
+  inject,
+  signal,
+  effect,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import { Service } from './service';
+import { ServiceService } from './service.service';
+import { SettingsService } from '../settings/settings.service';
+import { BaseComponent } from '../dashboard/base.component';
+import { Dashboard } from '../dashboard/dashboard';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MomentModule } from 'ngx-moment';
 
 @Component({
-    selector: 'service',
-    templateUrl: 'service.component.html',
-    styleUrls: ['service.component.scss'],
-    standalone: true,
-    imports: [CommonModule, FormsModule, MomentModule]
+  selector: 'service',
+  templateUrl: './service.component.html',
+  styleUrl: './service.component.scss',
+  standalone: true,
+  imports: [CommonModule, FormsModule, MomentModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ServiceComponent extends BaseComponent implements OnInit, OnChanges {
+export class ServiceComponent extends BaseComponent {
+  dashboard = input.required<Dashboard>();
+  service = input.required<Service>();
+  serviceUpdated = output<Service>();
 
-    @Input() dashboard!: Dashboard;
-    @Input() service!: Service;
+  private readonly serviceService = inject(ServiceService);
+  protected readonly settingsService = inject(SettingsService);
 
-    editing: boolean = false;
+  readonly editing = signal(false);
 
-    // setDisplayMode(mode: 'wide' | 'overlay') {
-    //     this.displayMode = mode;
-    // }
-    constructor(private serviceService: ServiceService,
-        protected settingsService: SettingsService,
-        protected override toastrService: ToastrService) {
-        super(toastrService);
+  readonly settings = () => this.settingsService.settings();
+  readonly editable = () => this.settingsService.editable();
+
+  constructor() {
+    super();
+    effect(() => {
+      this.service();
+      this.dashboard();
+      this.reload();
+    });
+  }
+
+  reload(): void {}
+
+  statusLevel(s: Service): string {
+    let status = 'unknown';
+    if (s.checked_at) {
+      if (
+        (!s.http || s.http_path_last) &&
+        (!s.https || s.https_path_last) &&
+        this.pingGood(s)
+      ) {
+        status = 'good';
+      } else {
+        status = 'bad';
+      }
     }
-    ngOnChanges(changes: SimpleChanges): void {
-        this.reload();
-    }
+    return status;
+  }
 
-    ngOnInit() {
-        this.reload();
-    }
+  pingGood(s: Service): boolean {
+    return !s.ping || (s.ping_last > 0 && s.ping_last < s.ping_threshold);
+  }
 
-    reload() {
-
-    }
-
-    settings() {
-        return this.settingsService.settings;
-    }
-
-
-    editable() {
-        return this.settingsService.editable;
-    }
-
-    statusLevel(s: Service): string {
-        let status = 'unknown';
-        if (s.checked_at) {
-            if ((!s.http || s.http_path_last) && (!s.https || s.https_path_last) && this.pingGood(s)) {
-                status = 'good';
-            } else {
-                status = 'bad';
-            }
+  update(s: Service): void {
+    const d = this.dashboard();
+    this.serviceService.update(d, s).subscribe({
+      next: (updated) => {
+        this.toastrService.success('Service updated');
+        this.editing.set(false);
+        this.serviceUpdated.emit(updated);
+      },
+      error: (e) => {
+        if (!this.checkAccessDenied(e)) {
+          this.toastrService.error(
+            this.serviceService.formatErrorsText(e.errors ?? {}),
+            'Service not updated.'
+          );
         }
-        return status;
-    }
-
-    pingGood(s: Service) {
-        return !s.ping || s.ping_last > 0 && s.ping_last < s.ping_threshold;
-    }
-
-    update(s: Service) {
-        // if(this.dashboard){
-        this.serviceService.update(this.dashboard, s).subscribe({
-            next: d => {
-                this.toastrService.success('Service updated');
-                // let i = this.dashboard.services.indexOf(s, 0);
-                // this.dashboard.services[i] = d;
-                this.service = d;
-                this.editing = false;
-            }, error: e => {
-                if (!this.checkAccessDenied(e)) {
-                    this.toastrService.error(this.serviceService.formatErrorsText(e.errors), 'Service not updated.');
-                }
-            }
-        });
-        // }
-    }
+      },
+    });
+  }
 }

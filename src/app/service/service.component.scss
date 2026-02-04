@@ -1,4 +1,4 @@
-@import '../../skycapp.scss';
+@use '../../skycapp.scss' as *;
 
 $overlay-service-size: 300px;
 $background-tile: url(/assets/images/textures/crossword.png) repeat;

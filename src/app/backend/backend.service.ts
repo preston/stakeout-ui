@@ -1,54 +1,55 @@
 // Author: Preston Lee
 
-import { Injectable } from "@angular/core";
-import { HttpHeaders } from '@angular/common/http';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { Status } from "../status/status";
-import { SettingsService } from "../settings/settings.service";
-import { Buffer } from 'buffer';
+import { Status } from '../status/status';
+import { SettingsService } from '../settings/settings.service';
+
+function toBase64(str: string): string {
+  return btoa(
+    String.fromCharCode(...new TextEncoder().encode(str))
+  );
+}
 
 @Injectable()
 export class BackendService {
+  static readonly STATUS_PATH = '/status';
+  static readonly TEST_PATH = '/test';
 
-	public static STATUS_PATH: string = '/status';
-	public static TEST_PATH: string = '/test';
+  private readonly http = inject(HttpClient);
+  private readonly settingsService = inject(SettingsService);
 
-	public url: string;
-	// public token: string | null = null;
+  readonly url: string = (window as unknown as { STAKEOUT_UI_SERVER_URL?: string })['STAKEOUT_UI_SERVER_URL'] ?? '';
 
-	constructor(protected http: HttpClient, protected settingsService: SettingsService) {
-		this.url = (window as any)["STAKEOUT_UI_SERVER_URL"];
-	}
+  headers(): HttpHeaders {
+    let headers = new HttpHeaders({
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    });
+    const s = this.settingsService.settings();
+    const b64token = toBase64(`${s.cds_username}:${s.cds_password}`);
+    headers = headers.set('Authorization', 'Basic ' + b64token);
+    return headers;
+  }
 
+  statusUrl(): string {
+    return this.url + BackendService.STATUS_PATH;
+  }
 
-	public headers(): HttpHeaders {
-		var headers = new HttpHeaders({ 'Accept': 'application/json' });
-		headers = headers.set('Content-Type', 'application/json');
-		const b64token = Buffer.from(this.settingsService.settings.cds_username + ':' + this.settingsService.settings.cds_password, 'binary').toString('base64');
-		headers = headers.set('Authorization', 'Basic ' + b64token);
-		// if (this.token) {
-		// 	headers = headers.append('Authorization', 'Bearer ' + this.token);
-		// }
-		return headers;
-	}
+  testUrl(): string {
+    return this.url + BackendService.TEST_PATH;
+  }
 
-	statusUrl(): string {
-		return this.url + BackendService.STATUS_PATH;
-	}
+  status() {
+    return this.http
+      .get<Status>(this.statusUrl(), { headers: this.headers() })
+      .pipe(map((res) => res));
+  }
 
-	testUrl(): string {
-		return this.url + BackendService.TEST_PATH;
-	}
-
-	status() {
-		let status = this.http.get<Status>(this.statusUrl(), { headers: this.headers() }).pipe(map(res => res));
-		return status;
-	}
-
-	test() {
-		let test = this.http.post<Status>(this.testUrl(), {}, { headers: this.headers() }).pipe(map(res => res));
-		return test;
-	}
-
+  test() {
+    return this.http
+      .post<Status>(this.testUrl(), {}, { headers: this.headers() })
+      .pipe(map((res) => res));
+  }
 }

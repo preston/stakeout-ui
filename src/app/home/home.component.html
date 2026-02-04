@@ -1,71 +1,124 @@
-<!-- <toaster-container [toasterconfig]="toasterConfigurationService"></toaster-container> -->
-
 <div id="dashboards" class="h-100">
+  <div class="wrapper">
+    <nav
+      id="sidebar"
+      [class.active]="sidebarActive()"
+      [class.inactive]="!sidebarActive()"
+    >
+      <div class="title">{{ title }}</div>
+      <ul class="list-unstyled components">
+        <li>
+          <h4 class="mt-4">
+            <a class="" role="button" (click)="sortBy('name')">
+              @if (sort() === 'name' && order() === 'asc') {
+                <span class="bi bi-arrow-down"></span>
+              }
+              @if (sort() === 'name' && order() === 'desc') {
+                <span class="bi bi-arrow-up"></span>
+              }
+              Dashboards
+            </a>
+            @if (editable()) {
+              <button
+                class="ms-1 btn btn-sm btn-primary"
+                role="button"
+                (click)="create()"
+              >
+                <span class="bi-plus-circle"></span> Add
+              </button>
+            }
+          </h4>
+          <ul class="list-unstyled" id="dashboards_list">
+            @for (d of dashboards(); track d.id) {
+              <li
+                class="my-2"
+                [routerLink]="['/dashboards', d.id]"
+                [routerLinkActive]="'active'"
+                role="button"
+              >
+                @if (editable()) {
+                  @if (!editing()[d.id]) {
+                    <button
+                      class="me-1 btn btn-primary btn-sm"
+                      role="button"
+                      (click)="setEditing(d.id, true)"
+                    >
+                      <span class="bi-pencil"></span>
+                    </button>
+                  }
+                  @if (!editing()[d.id]) {
+                    <span>{{ d.name }}</span>
+                  }
+                  @if (editing()[d.id]) {
+                    <form (submit)="update(d)" role="form" class="form">
+                      <div class="input-group">
+                        <input
+                          class="form-control form-control-sm"
+                          type="text"
+                          name="dashboard_name"
+                          [(ngModel)]="d.name"
+                          autofocus
+                          placeholder="My Dashboard"
+                        />
+                        <button
+                          class="btn btn-sm btn-primary"
+                          role="button"
+                          (click)="update(d)"
+                        >
+                          <span class="bi-save"></span> Save
+                        </button>
+                      </div>
+                    </form>
+                  }
+                  @if (!editing()[d.id]) {
+                    <button
+                      class="mx-1 btn btn-sm btn-danger float-end"
+                      role="button"
+                      (click)="delete(d)"
+                    >
+                      <span class="bi-trash"></span>
+                    </button>
+                  }
+                }
+                @if (!editable()) {
+                  <span>{{ d.name }}</span>
+                }
+              </li>
+            }
+          </ul>
+        </li>
+      </ul>
+      <hr />
+      <button
+        class="m-1 btn btn-sm btn-secondary float-end"
+        [routerLink]="['/settings']"
+      >
+        <span class="bi bi-gear"></span>
+      </button>
+      @if (settingsService.editable()) {
+        <button
+          class="m-1 btn btn-sm btn-warning float-end"
+          (click)="lock()"
+        >
+          <span class="bi bi-lock"></span> Lock Editing
+        </button>
+      }
+    </nav>
 
-    <div class="wrapper">
-
-        <nav id="sidebar" [class.active]="sidebarActive" [class.inactive]="!sidebarActive">
-            <div class="title">{{title}}</div>
-
-            <ul class="list-unstyled components">
-                <li>
-                    <h4 class="mt-4">
-                        <a class="" role="button" (click)="sortBy('name')">
-                            <span class="bi bi-arrow-down" *ngIf="sort == 'name' && order == 'asc'"></span>
-                            <span class="bi bi-arrow-up" *ngIf="sort == 'name' && order == 'desc'"></span>
-                            Dashboards
-                        </a>
-
-                        @if(editable()) {
-                        <button class="ms-1 btn btn-sm btn-primary " role="button " (click)="create() "><span
-                                class="bi-plus-circle"></span> Add</button>
-                        }
-                    </h4>
-                    <ul class="list-unstyled" id="dashboards_list">
-                        <li class="my-2" *ngFor="let d of dashboards" [routerLink]="['/dashboards', d.id]"
-                            [routerLinkActive]="'active'" role="button">
-                            <!-- [routerLink]="'/dashboards/' + d.id" -->
-                            @if(editable()) {
-                            <button *ngIf="!editing[d.id]" class="me-1 btn btn-primary btn-sm" role="button"
-                                (click)="editing[d.id] = true"><span class="bi-pencil"></span></button>
-                            }
-                            <span *ngIf="!editing[d.id]">{{d.name}}</span>
-                            @if(editable()) {
-                            <form (submit)="update(d)" role="form" class="form">
-                                <div class="input-group">
-                                    <input *ngIf="editing[d.id]" class="form-control form-control-sm" type="text"
-                                        name="dashboard_name" [(ngModel)]="d.name" autofocus
-                                        placeholder="My Dashboard" />
-                                    <button *ngIf="editing[d.id]" class="btn btn-sm btn-primary" role="button"
-                                        (click)="update(d)"><span class="bi-save"></span> Save</button>
-                                </div>
-                            </form>
-                            <button *ngIf="!editing[d.id]" class="mx-1 btn btn-sm btn-danger float-end" role="button"
-                                (click)="delete(d)"><span class="bi-trash"></span></button>
-                            }
-                        </li>
-                    </ul>
-                </li>
-
-            </ul>
-            <hr />
-
-
-            <button class="m-1 btn btn-sm btn-secondary float-end" [routerLink]="['/settings']"><span
-                    class="bi bi-gear"></span></button>
-            <button *ngIf="settingsService.editable" class="m-1 btn btn-sm btn-warning float-end" (click)="lock()"><span
-                    class="bi bi-lock"></span> Lock Editing</button>
-        </nav>
-
-        <div id="content">
-            <button type="button" id="sidebarCollapse" class='navbar-btn' [class.active]="sidebarActive "
-                [class.inactive]="!sidebarActive " (click)="toggleSidebar() ">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <router-outlet></router-outlet>
-            <!-- <dashboard *ngIf="dashboard_full " [dashboard]="dashboard_full"></dashboard> -->
-        </div>
+    <div id="content">
+      <button
+        type="button"
+        id="sidebarCollapse"
+        class="navbar-btn"
+        [class.active]="sidebarActive()"
+        [class.inactive]="!sidebarActive()"
+        (click)="toggleSidebar()"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <router-outlet></router-outlet>
     </div>
+  </div>
 </div>

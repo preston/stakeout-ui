@@ -1,173 +1,165 @@
 // Author: Preston Lee
 
-import { Component, OnChanges, OnInit, SimpleChanges } from "@angular/core";
-import { ToastrService } from "ngx-toastr";
-import { BackendService } from "../backend/backend.service";
-import { Status } from "../status/status";
-import { Dashboard } from "../dashboard/dashboard";
-import { DashboardService } from "../dashboard/dashboard.service";
+import {
+  Component,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
-import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
-import { MomentModule } from "ngx-moment";
-import { DashboardComponent } from "../dashboard/dashboard.component";
-import { FormsModule } from "@angular/forms";
-import { CommonModule, NgFor, NgIf } from "@angular/common";
-import { BaseComponent } from "../dashboard/base.component";
-import { SettingsService } from "../settings/settings.service";
+import { BackendService } from '../backend/backend.service';
+import { Status } from '../status/status';
+import { Dashboard } from '../dashboard/dashboard';
+import { DashboardService } from '../dashboard/dashboard.service';
+import { SettingsService } from '../settings/settings.service';
+import { BaseComponent } from '../dashboard/base.component';
+import { Router, ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { MomentModule } from 'ngx-moment';
+import { DashboardComponent } from '../dashboard/dashboard.component';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'home',
-    templateUrl: 'home.component.html',
-    styleUrls: ['home.component.scss'],
-    standalone: true,
-    imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, DashboardComponent, MomentModule, RouterOutlet]
+  selector: 'home',
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterLink,
+    RouterLinkActive,
+    FormsModule,
+    MomentModule,
+    RouterOutlet,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent extends BaseComponent implements OnInit {
+export class HomeComponent extends BaseComponent {
+  private readonly backendService = inject(BackendService);
+  private readonly dashboardService = inject(DashboardService);
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  protected readonly settingsService = inject(SettingsService);
 
+  readonly title = (window as unknown as { STAKEOUT_UI_TITLE?: string })['STAKEOUT_UI_TITLE'] ?? '';
+  readonly sidebarActive = signal(true);
+  readonly status = signal<Status | null>(null);
+  readonly editing = signal<Record<string, boolean>>({});
+  readonly dashboards = signal<Dashboard[]>([]);
+  readonly dashboard = signal<Dashboard | null>(null);
+  readonly sort = signal<'name'>('name');
+  readonly order = signal<'asc' | 'desc'>('asc');
 
-    public title: string = (window as any)["STAKEOUT_UI_TITLE"];
+  readonly editable = () => this.settingsService.editable();
 
-    sidebarActive: boolean = true;
+  constructor() {
+    super();
+    this.backendService.status().subscribe((d) => this.status.set(d));
+    this.reload();
+  }
 
-    status: Status | null = null;
+  lock(): void {
+    this.settingsService.setEditable(false);
+  }
 
-    editing: { [key: string]: boolean } = {};
+  sortBy(sort: 'name'): void {
+    this.sort.set(sort);
+    this.order.update((o) => (o === 'asc' ? 'desc' : 'asc'));
+    this.reload();
+  }
 
-    public dashboards: Dashboard[] = [];
-    public dashboard: Dashboard | null = null;
-
-    page = '1';
-    perPage = '25';
-    sort: 'name' = 'name';
-    order: 'asc' | 'desc' = 'asc';
-
-    constructor(
-        protected backendService: BackendService,
-        protected dashboardService: DashboardService,
-        protected override toastrService: ToastrService,
-        protected router: Router,
-        protected activatedRoute: ActivatedRoute,
-        protected settingsService: SettingsService) {
-        super(toastrService);
-
-
-    }
-
-    ngOnInit() {
-        this.backendService.status().subscribe(d => {
-            this.status = d;
-            console.log("Server status: " + JSON.stringify(this.status));
-        });
-        this.reload();
-
-    }
-
-
-    lock() {
-        this.settingsService.editable = false;
-    }
-
-    editable() {
-        return this.settingsService.editable;
-    }
-
-    // moment() {
-    // return this.backendService.moment().;
-    // }
-
-
-    sortBy(sort: 'name') {
-        this.sort = sort;
-        this.order = this.order === 'asc' ? 'desc' : 'asc';
-        this.reload();
-    }
-
-    reload() {
-        this.dashboardService.index(false, this.sort, this.order).subscribe(d => {
-            this.dashboards = d;
-
-            // console.log("ROUTER: " +this.router.url);
-            // console.log("PATH: " +this.activatedRoute.root.snapshot.url);
-            if (this.router.url == '/') {
-                this.router.navigate(['/dashboards', d[0].id]);
-            }
-            // this.activatedRoute.url.subscribe(u => {
-            //     console.log("URL: "+ u);                
-            // });
-            // if (d.length > 0) {
-
-        });
-    }
-
-    select(dashboard: Dashboard | null) {
-        if (dashboard) {
-            this.dashboard = dashboard;
-            this.router.navigate(['/dashboards', dashboard.id]);
-        } else {
-            this.dashboard = null;
-            this.router.navigate(['/']);
+  reload(): void {
+    this.dashboardService
+      .index(false, this.sort(), this.order())
+      .subscribe((d) => {
+        this.dashboards.set(d);
+        if (this.router.url === '/' && d.length > 0) {
+          this.router.navigate(['/dashboards', d[0].id]);
         }
+      });
+  }
+
+  select(d: Dashboard | null): void {
+    if (d) {
+      this.dashboard.set(d);
+      this.router.navigate(['/dashboards', d.id]);
+    } else {
+      this.dashboard.set(null);
+      this.router.navigate(['/']);
     }
+  }
 
+  toggleSidebar(): void {
+    this.sidebarActive.update((v) => !v);
+  }
 
-    toggleSidebar() {
-        this.sidebarActive = !this.sidebarActive;
-        console.log("Toggled sidebar to " + this.sidebarActive);
-    }
+  setEditing(id: string, value: boolean): void {
+    this.editing.update((e) => ({ ...e, [id]: value }));
+  }
 
-    create() {
-        let d = new Dashboard();
-        d.name = 'Dashboard ' + uuidv4().substring(0, 4);
-        this.dashboardService.create(d).subscribe({
-            next: r => {
-                this.toastrService.success('Please update the details accordingly!', 'Dashboard created.');
-                this.dashboards.push(r);
-                this.select(r)
-                this.editing[r.id] = true;
-                // this.route.navigate(['dashboards', r.id]);
-                this.select(r);
-            }, error: e => {
-                if (!this.checkAccessDenied(e)) {
-                    this.toastrService.error(this.dashboardService.formatErrorsText(e.errors), 'Dashboard not created.');
-                }
-            }
-        });
-    }
-
-    update(dashboard: Dashboard) {
-        if (dashboard) {
-            this.dashboardService.update(dashboard).subscribe({
-                next: d => {
-                    this.toastrService.success('Dashboard updated');
-                    let i = this.dashboards.indexOf(dashboard, 0);
-                    this.editing[d.id] = false;
-                    this.dashboards[i] = d;
-                    this.select(d);
-                }, error: e => {
-                    if (!this.checkAccessDenied(e)) {
-                        this.toastrService.error(this.dashboardService.formatErrorsText(e.errors), 'Dashboard not updated.');
-                    }
-                }
-            });
+  create(): void {
+    const newDashboard = new Dashboard();
+    newDashboard.name = 'Dashboard ' + uuidv4().substring(0, 4);
+    this.dashboardService.create(newDashboard).subscribe({
+      next: (r) => {
+        this.toastrService.success(
+          'Please update the details accordingly!',
+          'Dashboard created.'
+        );
+        this.dashboards.update((list) => [...list, r]);
+        this.select(r);
+        this.editing.update((e) => ({ ...e, [r.id]: true }));
+      },
+      error: (e) => {
+        if (!this.checkAccessDenied(e)) {
+          this.toastrService.error(
+            this.dashboardService.formatErrorsText(e.errors ?? {}),
+            'Dashboard not created.'
+          );
         }
-    }
+      },
+    });
+  }
 
-    delete(dashboard: Dashboard) {
-        this.dashboardService.delete(dashboard).subscribe({
-            next: d => {
-                this.toastrService.success("It's service list has also been removed.", 'Dashboard deleted');
-                console.log("Deleted dashboard: " + dashboard.name);
-                this.select(null);
-                let i = this.dashboards.indexOf(dashboard, 0);
-                if (i >= 0) {
-                    this.dashboards.splice(i, 1);
-                }
-            }, error: e => {
-                if (!this.checkAccessDenied(e)) {
-                    this.toastrService.error(this.dashboardService.formatErrorsText(e.errors), 'Dashboard not deleted.');
-                }
-            }
-        });
-    }
+  update(d: Dashboard): void {
+    this.dashboardService.update(d).subscribe({
+      next: (updated) => {
+        this.toastrService.success('Dashboard updated');
+        this.editing.update((e) => ({ ...e, [updated.id]: false }));
+        this.dashboards.update((list) =>
+          list.map((item) => (item.id === d.id ? updated : item))
+        );
+        this.select(updated);
+      },
+      error: (e) => {
+        if (!this.checkAccessDenied(e)) {
+          this.toastrService.error(
+            this.dashboardService.formatErrorsText(e.errors ?? {}),
+            'Dashboard not updated.'
+          );
+        }
+      },
+    });
+  }
+
+  delete(d: Dashboard): void {
+    this.dashboardService.delete(d).subscribe({
+      next: () => {
+        this.toastrService.success(
+          "It's service list has also been removed.",
+          'Dashboard deleted'
+        );
+        this.select(null);
+        this.dashboards.update((list) => list.filter((x) => x.id !== d.id));
+      },
+      error: (e) => {
+        if (!this.checkAccessDenied(e)) {
+          this.toastrService.error(
+            this.dashboardService.formatErrorsText(e.errors ?? {}),
+            'Dashboard not deleted.'
+          );
+        }
+      },
+    });
+  }
 }
-
