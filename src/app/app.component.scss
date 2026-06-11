@@ -18,3 +18,8 @@ footer {
         color: var(--bs-link-color);
     }
 }
+
+// Keep toasts above the fixed footer
+:host ::ng-deep .toaster-bottom-right {
+    bottom: 2.5rem;
+}

@@ -33,7 +33,6 @@
                         "styles": [
                             "node_modules/bootswatch/dist/litera/bootstrap.min.css",
                             "node_modules/bootstrap-icons/font/bootstrap-icons.css",
-                            "node_modules/ngx-toastr/toastr.css",
                             "src/styles.scss"
                         ],
                         "scripts": [
@@ -85,19 +84,12 @@
                     }
                 },
                 "test": {
-                    "builder": "@angular/build:karma",
+                    "builder": "@angular/build:unit-test",
                     "options": {
-                        "polyfills": [],
                         "tsConfig": "tsconfig.spec.json",
-                        "inlineStyleLanguage": "scss",
-                        "assets": [
-                            "src/favicon.ico",
-                            "src/assets"
-                        ],
-                        "styles": [
-                            "src/styles.scss"
-                        ],
-                        "scripts": []
+                        "runner": "vitest",
+                        "buildTarget": "stakeout-ui:build:development",
+                        "setupFiles": ["src/test-setup.ts"]
                     }
                 }
             }

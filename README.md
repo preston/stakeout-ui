@@ -13,12 +13,26 @@ The UI provides an unauthenticated viewer interface for monitoring realtime serv
 
 ## Developer Quick Start
 
-This project uses [Angular](https://angular.io) [Bootstrap](https://getbootstrap.com/) for layout and [SCSS](http://sass-lang.com) for CSS. `npm` is the package manager. Assuming you already have node installed via [`nvm`](https://github.com/nvm-sh/nvm) or similar, set the follow environment variables and run `npm run start`. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files. The following must be set:
+This project uses [Angular 22](https://angular.dev), [Bootstrap](https://getbootstrap.com/) for layout, and [SCSS](http://sass-lang.com) for CSS. Toast notifications use [ng-angular-popup](https://www.npmjs.com/package/ng-angular-popup). `npm` is the package manager. Use **Node 26** (see the Dockerfile).
 
-	export STAKEOUT_UI_SERVER_URL=http://localhost:3000
-	export STAKEOUT_UI_TITLE="My Stakeout"
+Assuming you already have Node installed via [`nvm`](https://github.com/nvm-sh/nvm) or similar, set the following environment variables and run `npm run start`. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-# Building for Production with Docker
+```sh
+export STAKEOUT_UI_SERVER_URL=http://localhost:3000
+export STAKEOUT_UI_TITLE="My Stakeout"
+npm ci
+npm run start
+```
+
+### Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run start` | Dev server |
+| `npm run build` | Production build |
+| `npm test` | Unit tests (Vitest via `@angular/build:unit-test`) |
+
+## Building for Production with Docker
 
 To build with [Docker](https://www.docker.com) and [nginx](http://nginx.org), use the included Dockerfile, such as:
 
